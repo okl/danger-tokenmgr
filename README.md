@@ -26,8 +26,7 @@ This allows you to run the UI and manage tokens and values.
 
 To run the command line replacement dirver run:
 
-    lein run <application-name> <environment> <directory to filter>
-    [--token "TOKEN_NAME=TOKEN_VALUE"]
+    lein run <application-name> <environment> <directory to filter [--token "TOKEN_NAME=TOKEN_VALUE"]
 
 ## License
 
