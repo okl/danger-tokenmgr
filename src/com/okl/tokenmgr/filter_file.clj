@@ -93,4 +93,4 @@
             dir (second (rest args)) ;; aka third
             tokens (get-token-values app envt cli-tokens)
             tokens (process-token-values tokens)]
-        (process-dir (print-expr dir) tokens)))))
+        (process-dir dir tokens)))))
