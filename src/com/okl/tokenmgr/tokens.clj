@@ -98,6 +98,9 @@
 
 (defn get-apps [path]
   "get all of the applications after a particular path"
+
+  (if-not (.get-item storage base-path)
+    (.create storage base-path "" ""))
   (let [full-path (path->full-path path)]
   (map
    #(hash-map :name (subs (get % :name) (inc (count base-path)))
