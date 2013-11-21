@@ -1,15 +1,36 @@
 (ns com.okl.tokenmgr.views
   (:use [hiccup core page]
-        [clojure.string :only (join)]
-        [ring.util.codec :only (url-encode url-decode)]))
+        [clojure.string :only (join split)]
+        [ring.util.codec :only (url-encode url-decode)]
+        [clojure.tools.logging :as log]))
 
 (defn- path->pretty-path [path]
   (str "/" path))
 
-(defn make-link [path name]
+(defn- make-link [path name]
   [:a {:href path} name])
 
-(defn gen-header [title]
+(defn- path->url-encoded-path [path]
+  (if (.startsWith path "/application/")
+    (str "/application/" (url-encode (subs path (count "/application/"))))
+    (url-encode path)))
+
+(defn- generate-breadcrumbs [path]
+  "Generate a url breadcrumb string at the top of the page"
+  (if (empty? path)
+    [:a {:href "/application"} "/" ]
+    (let [crumbs (split path #"/")]
+      (reduce
+       (fn [result next]
+         (let [last-path (:href (get (last result) 1))]
+           (concat result
+                   [[:a {:href
+                         (path->url-encoded-path
+                          (str last-path "/" next))} (str next "/")]])))
+       [[:a {:href "/application"} "/" ]]
+       crumbs))))
+
+(defn- gen-header [title]
   [:head
    [:title title]
    [:script {:src
@@ -35,7 +56,7 @@
 
 
 
-(defn delete-link [path]
+(defn- delete-link [path]
   [:a
    {:onclick
     (str "var delconf = confirm ('Do you really want to delete " (url-decode path)" ?');
@@ -80,7 +101,7 @@ error: function(request, status, message) {
     :href "javascriptIsDisabled"}
    "add"])
 
-(defn apps-div [current-path apps]
+(defn- apps-div [current-path apps]
   [:div {:name "apps-div"}
    [:h2 "Applications"]
    [:table
@@ -142,7 +163,7 @@ error: function(request, status, message) {
           other-keys))))
 
 
-(defn tokens-div [app tokens]
+(defn- tokens-div [app tokens]
   [:div {:name "tokens-div"}
    [:h2 "Tokens"]
    [:table {:border 1}
@@ -182,6 +203,6 @@ error: function(request, status, message) {
   (html5
    (gen-header (str my-name ":" app))
      [:body
-      [:h1 (path->pretty-path app)]
+      [:h1 (generate-breadcrumbs app)]
       (apps-div app apps)
       (tokens-div app tokens)]))
