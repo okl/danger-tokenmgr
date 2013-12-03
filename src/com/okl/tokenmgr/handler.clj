@@ -39,7 +39,6 @@
     (GET "/application/:app" [app]
     (gen-page app))
   (DELETE "/token/:token" [token]
-
      (if (delete-token token)
       {:status 200
        :body {:status "success"}}
@@ -49,7 +48,6 @@
     (let [pathname (if (empty? path)
                      name
                      (join "/" [path name]))]
-      (.. System out (println (str "name is " name "\npathname is " pathname)))
       (try
         (if (create-token pathname description environment value)
           {:status 200
@@ -59,7 +57,11 @@
         (catch Exception e
           {:status 200
            :body {:status "failure" :message (.getMessage e)}}))))
-    (route/resources "/")
+  (GET "/api/tokens/:app" [app]
+    (denormalize-tokens (get-tokens (url-decode app))))
+  (GET "/testing/appication/:app" [app]
+    (dynamic-page app (denormalize-tokens (get-tokens app))))
+  (route/resources "/")
   (route/not-found "Not Found"))
 
 

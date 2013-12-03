@@ -175,3 +175,18 @@
   "get all the tokens in a particular path"
   (vals
    (get-tokens-map path)))
+
+(defn denormalize-token [token]
+  (let [name (:name token)
+        description (:description token)]
+    (map (fn [x]
+           (log/info (str "EEE token has value "  (get (:values token) x)))
+           {:name name
+            :description description
+            :environment x
+            :value (get (get (:values token) x) "value")
+            :source (get (get (:values token) x) "source")})
+         (keys (:values token)))))
+
+(defn denormalize-tokens [tokens]
+  (apply concat (map denormalize-token tokens)))

@@ -13,6 +13,6 @@
   :plugins [[lein-ring "0.8.5"]]
   :ring {:handler com.okl.tokenmgr.handler/app}
   :main com.okl.tokenmgr.filter-file
-  :resource-paths ["resources"]
+  :resource-paths ["resources" "SlickGrid"]
   :profiles
   {:dev {:dependencies [[ring-mock "0.1.5"]]}})
