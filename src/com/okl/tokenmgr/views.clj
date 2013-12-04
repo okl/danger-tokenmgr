@@ -259,6 +259,7 @@ error: function(request, status, message) {
     [:script {:type "text/javascript"}
      (str "
 var grid;
+var dv;
 
 function requiredFieldValidator(value) {
   if (value == null || value == undefined || !value.length) {
@@ -272,24 +273,29 @@ var columns = [
   {id: 'token', name: 'Token', field: 'name', width: 100, editor: Slick.Editors.Text, validator: requiredFieldValidator, sortable: true},
   {id: 'description', name: 'Description', field: 'description', width: 200, editor: Slick.Editors.Text},
   {id: 'environment', name: 'Environment', field: 'environment', width: 200, sortable: true, editor: Slick.Editors.Text},
-  {id: 'value', name: 'Value', field: 'value', width: 200, editor: Slick.Editors.Text}];
+  {id: 'value', name: 'Value', field: 'value', width: 200, editor: Slick.Editors.Text},
+  {id: 'source', name: 'Source', field: 'source', width: 400, sortable: true},
+  {id: 'delete', name: 'Delete', field: 'delete', width: 200, formatter: deleteButtonFormatter}];
 
+
+function deleteButtonFormatter(row, cell, value, columnDef, dataContext) {
+  var button = \"<input class='del' type='button' id='\" + dataContext.name + \"' />\";
+  return button;
+}
 
   var options = {
     editable: true,
-    enableAddRow: true,
+    enableAddRow: false,
     enableCellNavigation: true,
     autoEdit: false,
     autoHeight: true
    };
 
-
-
 var loadingIndicator = null;
 
 $(function () {
 
-var dv = Slick.Data.DataView();
+dv = Slick.Data.DataView();
 var gridSorter = function(columnField, isAsc, grid, gridData) {
     var sign = isAsc ? 1 : -1;
     var field = columnField
@@ -315,11 +321,21 @@ grid.autosizeColumns();
 
 grid.onAddNewRow.subscribe(function (e, args) {
   var item = args.item;
-  grid.invalidateRow(data.length);
-  data.push(item);
+  grid.invalidateRow(dv.length);
+  dv.addItem(item);
   grid.updateRowCount();
   grid.render();
 });
+
+$.ajax({
+  url: '/api/tokens/" (url-encode app) "',
+  type: 'GET',
+  success: function(data) {
+    for (i = 0; i < data.length; i++) {
+      data[i]['id'] = data[i]['name'] + ':' + data[i]['environment'];
+    }
+    dv.setItems(data);
+  }});
 
 grid.onSort.subscribe(function(e, args) {
   gridSorter(args.sortCol.field, args.sortAsc, grid, dv);
@@ -335,16 +351,38 @@ dv.onRowsChanged.subscribe(function (e, args) {
   grid.render();
 });
 
-$.ajax({
-  url: '/api/tokens/" (url-encode app) "',
-  type: 'GET',
-  success: function(data) {
-    dv.setItems(data, 'name');
-  },
-  error: function(req, status, message) {
-    alert('Error loading data');
+grid.onCellChange.subscribe(function (e, args) {
+  var row = dv.getItem(args.row);
+  var columns = grid.getColumns();
+  var data = {};
+  // need to skip the delete column on the right
+  for (i = 0; i < columns.length; i++) {
+    console.log(i);
+    if(columns[i]['editor']) {
+       property = columns[i]['field'];
+       data[property] = row[property];
+    }
   }
-});
 
-  })"
+  data['path'] = '" app "';
+
+  $.ajax({
+  url: '/token',
+  type: 'PUT',
+  contentType: 'application/json; charset=UTF-8',
+  dataType: 'json',
+  data: JSON.stringify(data),
+  success: function(data) {
+    if(data.status != 'success') {
+      alert('Error adding token:\\n' + data.message);
+    }
+    document.location.reload(true);
+  },
+  error: function(request, status, message) {
+    alert('Error adding token ' + data['name']);
+    document.location.reload(true);
+  }
+  });
+});
+})"
 )]]))
