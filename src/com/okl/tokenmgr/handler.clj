@@ -59,8 +59,10 @@
            :body {:status "failure" :message (.getMessage e)}}))))
   (GET "/api/tokens/:app" [app]
     (denormalize-tokens (get-tokens (url-decode app))))
+  (GET "/api/tokens/" []
+    (denormalize-tokens (get-tokens "")))
   (GET "/testing/appication" []
-    (dynamic-page "/"))
+    (dynamic-page ""))
   (GET "/testing/appication/:app" [app]
     (dynamic-page app))
   (route/resources "")

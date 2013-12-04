@@ -274,9 +274,17 @@ var columns = [
   {id: 'description', name: 'Description', field: 'description', width: 200, editor: Slick.Editors.Text},
   {id: 'environment', name: 'Environment', field: 'environment', width: 200, sortable: true, editor: Slick.Editors.Text},
   {id: 'value', name: 'Value', field: 'value', width: 200, editor: Slick.Editors.Text},
-  {id: 'source', name: 'Source', field: 'source', width: 400, sortable: true},
+  {id: 'source', name: 'Source', field: 'source', width: 400, sortable: true, formatter: sourceFormatter},
   {id: 'delete', name: 'Delete', field: 'delete', width: 200, formatter: deleteButtonFormatter}];
 
+
+function sourceFormatter(row, cell, value, columnDef, dataContext) {
+  if(value == '') {
+     return '/';
+  } else {
+     return value;
+  }
+}
 
 function deleteButtonFormatter(row, cell, value, columnDef, dataContext) {
   var button = \"<input class='del' type='button' id='\" + dataContext.id + \"' value='delete'>\";
