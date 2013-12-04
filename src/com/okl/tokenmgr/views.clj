@@ -230,6 +230,7 @@ error: function(request, status, message) {
    [:script {:src "/slick-grid/plugins/slick.cellrangedecorator.js"}]
    [:script {:src "/slick-grid/plugins/slick.cellrangeselector.js"}]
    [:script {:src "/slick-grid/plugins/slick.rowselectionmodel.js"}]
+   [:script {:src "/slick-grid/slick.dataview.js"}]
    [:script {:src "//code.jquery.com/ui/1.10.3/jquery-ui.js"}]
    [:script {:type "text/javascript"}
     "$.fn.serializeObject = function()
@@ -282,10 +283,13 @@ var columns = [
     autoHeight: true
    };
 
+
+
 var loadingIndicator = null;
 
 $(function () {
 
+var dv = Slick.Data.DataView();
 var gridSorter = function(columnField, isAsc, grid, gridData) {
     var sign = isAsc ? 1 : -1;
     var field = columnField
@@ -299,14 +303,11 @@ var gridSorter = function(columnField, isAsc, grid, gridData) {
     grid.render();
 }
 
-
-var data = " (json/write-str tokens)
-";
-grid = new Slick.Grid('#testdiv', data, columns, options);
+grid = new Slick.Grid('#testdiv', dv, columns, options);
 
 grid.setSelectionModel(new Slick.RowSelectionModel());
 
-gridSorter('token', true, grid, data);
+gridSorter('token', true, grid, dv);
 
 grid.setSortColumn('token', true);
 
@@ -321,7 +322,29 @@ grid.onAddNewRow.subscribe(function (e, args) {
 });
 
 grid.onSort.subscribe(function(e, args) {
-  gridSorter(args.sortCol.field, args.sortAsc, grid, data);
+  gridSorter(args.sortCol.field, args.sortAsc, grid, dv);
 });
+
+dv.onRowCountChanged.subscribe(function(e, args) {
+  grid.updateRowCount();
+  grid.render();
+});
+
+dv.onRowsChanged.subscribe(function (e, args) {
+  grid.invalidateRows(args.rows);
+  grid.render();
+});
+
+$.ajax({
+  url: '/api/tokens/" (url-encode app) "',
+  type: 'GET',
+  success: function(data) {
+    dv.setItems(data, 'name');
+  },
+  error: function(req, status, message) {
+    alert('Error loading data');
+  }
+});
+
   })"
 )]]))
