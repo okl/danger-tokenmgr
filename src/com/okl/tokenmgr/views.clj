@@ -250,7 +250,7 @@ error: function(request, status, message) {
     return o;
 };"]])
 
-(defn dynamic-page [app tokens]
+(defn dynamic-page [app]
   (html5
    (gen-dynamic-header (str my-name ":" app))
    [:body
@@ -279,7 +279,7 @@ var columns = [
 
 
 function deleteButtonFormatter(row, cell, value, columnDef, dataContext) {
-  var button = \"<input class='del' type='button' id='\" + dataContext.name + \"' />\";
+  var button = \"<input class='del' type='button' id='\" + dataContext.id + \"' value='delete'>\";
   return button;
 }
 
@@ -310,8 +310,6 @@ var gridSorter = function(columnField, isAsc, grid, gridData) {
 }
 
 grid = new Slick.Grid('#testdiv', dv, columns, options);
-
-grid.setSelectionModel(new Slick.RowSelectionModel());
 
 gridSorter('token', true, grid, dv);
 
