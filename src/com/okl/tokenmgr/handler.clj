@@ -11,63 +11,17 @@
             [roxxi.utils.print :refer :all]))
 (use '[clojure.string :only (join)])
 
-(defn gen-page [app]
-  (page app (get-apps app) (get-tokens app)))
-
 (defroutes app-routes
   (GET "/" []
-    (gen-page ""))
+    (page ""))
   (GET "/application" {}
-    (gen-page ""))
-  (DELETE "/application/:app" [app]
-    (.. System out (println (str "attempting to delete " app)))
-    (if (delete-app (url-decode app))
-      {:status 200
-       :body {:status "success"}}
-      {:status 200
-       :body {:status "failure" :message "No item to delete"}}))
-  (PUT "/application" [name description path]
-    (let [pathname (if (empty? path)
-                     name
-                     (join "/" [path name]))]
-      (try
-        (if (create-app pathname description)
-          {:status 200
-           :body {:status "success"}}
-          {:status 200
-           :body {:status "failure" :message "Item not created"}})
-        (catch IllegalStateException e
-          {:status 200
-           :body {:status "failure" :message (.getMessage e)}}))))
-    (GET "/application/:app" [app]
-    (gen-page app))
-  (DELETE "/token/:token" [token]
-     (if (delete-token token)
-      {:status 200
-       :body {:status "success"}}
-      {:status 200
-       :body {:status "failure" :message "No item to delete"}}))
-  (PUT "/token" [name description environment value path]
-    (let [pathname (if (empty? path)
-                     name
-                     (join "/" [path name]))]
-      (try
-        (if (create-token pathname description environment value)
-          {:status 200
-           :body {:status "success"}}
-          {:status 200
-           :body {:status "failure" :message "Item not created"}})
-        (catch Exception e
-          {:status 200
-           :body {:status "failure" :message (.getMessage e)}}))))
+    (page ""))
+  (GET "/application/:app" [app]
+    (page app))
   (GET "/api/tokens/:app" [app]
     (denormalize-tokens (get-tokens (url-decode app))))
   (GET "/api/tokens/" []
     (denormalize-tokens (get-tokens "")))
-  (GET "/testing/appication" []
-    (dynamic-page ""))
-  (GET "/testing/appication/:app" [app]
-    (dynamic-page app))
   (DELETE "/api/tokens/:pathname/:envt" [pathname envt]
       (try
         (if (delete-value pathname envt)
