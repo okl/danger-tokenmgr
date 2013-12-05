@@ -6,7 +6,9 @@
   (:require [compojure.handler :as handler]
             [compojure.route :as route]
             [ring.middleware.json :as middleware]
-            [clojure.data.json :as json]))
+            [clojure.data.json :as json]
+            [clojure.tools.logging :as log]
+            [roxxi.utils.print :refer :all]))
 (use '[clojure.string :only (join)])
 
 (defn gen-page [app]
@@ -77,26 +79,27 @@
           {:status 200
            :body {:status "failure" :message (.getMessage e)}})))
   (PUT "/api/tokens" {body :body}
-    (let [tokens (json/read-str (slurp body))]
-      (try
-        (if (some true? (map (fn[token]
-                               (let [path (get token "path")
-                                     name (get token "name")
-                                     pathname (if (empty? path)
-                                                name
-                                                (join "/" [path name]))]
-                                 (create-token pathname
-                                               (get token "description")
-                                               (get token "environment")
-                                               (get token "value"))))
-                             tokens))
+    (try
+      (let [tokens (json/read-str (slurp body))
+            results (map (fn[token]
+                           (let [path (get token "path")
+                                 name (get token "name")
+                                 pathname (if (empty? path)
+                                            name
+                                            (join "/" [path name]))]
+                             (create-token pathname
+                                           (get token "description")
+                                           (get token "environment")
+                                           (get token "value"))))
+                         tokens)]
+        (if (every? identity results)
           {:status 200
            :body {:status "success"}}
           {:status 200
-           :body {:status "failure" :message "Item not created"}})
-        (catch IllegalStateException e
-          {:status 200
-           :body {:status "failure" :message (.getMessage e)}}))))
+           :body {:status "failure" :message "Some items may not have been updated"}}))
+      (catch IllegalStateException e
+        {:status 200
+         :body {:status "failure" :message (.getMessage e)}})))
   (route/resources "")
   (route/not-found "Not Found"))
 
