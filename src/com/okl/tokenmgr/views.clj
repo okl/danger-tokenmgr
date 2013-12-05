@@ -78,7 +78,7 @@
                          ""
                          (url-encode app))]
     (html5
-     (gen-dynamic-header (str my-name ":" app))
+     (gen-header (str my-name ":" app))
      [:body
       [:h1 (generate-breadcrumbs app)]
       [:div {:id "testdiv" :style "width:80%;height:300px;"} ""]
