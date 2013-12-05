@@ -14,6 +14,7 @@ function AppSlickGrid(path, urlEncodedPath) {
     }
 
     function deleteButtonFormatter(row, cell, value, columnDef, dataContext) {
+
         var button = "<input class='ApplicationDelete' type='button' id='" + dataContext.id + "' value='delete'>";
         return button;
     }
@@ -22,7 +23,9 @@ function AppSlickGrid(path, urlEncodedPath) {
         if(typeof value == 'undefined') {
             return ''
         } else {
-            var link = "<a href='/application/" + urlEncodedPath + dataContext.name + "'>" + dataContext.name + "</a>";
+	    var pathname = dataContext.name;
+	    var name = pathname.substring(path.length);
+            var link = "<a href='/application/" + encodeURIComponent(pathname) + "'>" + name + "</a>";
             return link;
         }
     }
