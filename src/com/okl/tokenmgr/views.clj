@@ -86,8 +86,8 @@
       [:input {:type "submit" :class "AppAddNewRow" :value "Add New Row"}]
       [:input {:type "submit" :class "AppSubmitChanges" :value "Submit Changes"}]
       [:input {:type "submit" :class "AppResetChanges" :value "Reset Changes"}]
-;      [:script {:type "text/javascript"}
-;       (str "new AppSlickGrid('" app "', '"url-encoded-app "');")]
+      [:script {:type "text/javascript"}
+       (str "new AppSlickGrid('" app "', '"url-encoded-app "');")]
       [:div {:id "tokendiv" :style "width:80%;height:300px;"} ""]
       [:input {:type "submit" :class "TokenAddNewRow" :value "Add New Row"}]
       [:input {:type "submit" :class "TokenSubmitChanges" :value "Submit Changes"}]
