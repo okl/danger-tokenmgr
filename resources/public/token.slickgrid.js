@@ -10,8 +10,12 @@ function TokenSlickGrid(path, urlEncodedPath) {
     }
 
     function deleteButtonFormatter(row, cell, value, columnDef, dataContext) {
-        var button = "<input class='TokenDelete' type='button' id='" + dataContext.id + "' value='delete'>";
-        return button;
+        if(dataContext.source == path) {
+            var button = "<input class='TokenDelete' type='button' id='" + dataContext.id + "' value='delete'>";
+            return button;
+        } else {
+            return "";
+        }
     }
 
     function sourceFormatter(row, cell, value, columnDef, dataContext) {
@@ -60,7 +64,7 @@ function TokenSlickGrid(path, urlEncodedPath) {
     }
 
     function submitTokens(data) {
-	console.log("Sumitting tokens" + data);
+        console.log("Sumitting tokens" + data);
         $.ajax({type: 'PUT',
                 url: '/api/tokens',
                 //          contentType: 'application/json; charset=UTF-8',
