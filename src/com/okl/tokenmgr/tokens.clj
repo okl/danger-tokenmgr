@@ -76,6 +76,7 @@
 
 (defn create-token [token description environment value]
   "creates/updates a token"
+  (log/info (str "Trying to create token " token "\nwith desc " description "\nenvt " environment "\nand value " value))
   (let [good-token (trim token)
         full-path (join "/" [base-path good-token])
         path  (if (> (.lastIndexOf token "/") -1)

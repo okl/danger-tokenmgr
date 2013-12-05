@@ -256,6 +256,8 @@ error: function(request, status, message) {
    [:body
     [:h1 (generate-breadcrumbs app)]
     [:div {:id "testdiv" :style "width:80%;height:300px;"} ""]
+    [:input {:type "submit" :class "submitChanges" :value "Submit Changes"}]
+    [:input {:type "submit" :class "resetChanges" :value "Reset Changes"}]
     [:script {:type "text/javascript"}
      (str "
 var grid;
@@ -301,6 +303,43 @@ function deleteButtonFormatter(row, cell, value, columnDef, dataContext) {
 
 var loadingIndicator = null;
 
+
+function reloadTable() {
+  $.ajax({
+    url: '/api/tokens/" (url-encode app) "',
+    type: 'GET',
+    success: function(data) {
+      for (i = 0; i < data.length; i++) {
+         data[i]['id'] = data[i]['name'] + ':' + data[i]['environment'];
+      }
+      dv.beginUpdate();
+      dv.setItems(data);
+      dv.endUpdate();
+      grid.invalidate();
+      grid.render();
+  }});
+}
+
+function submitTokens(data) {
+  $.ajax({type: 'PUT',
+          url: '/api/tokens',
+//          contentType: 'application/json; charset=UTF-8',
+          contentType: 'text/plain',
+          dataType: 'json',
+          data: data,
+          success: function(data) {
+            if(data.status != 'success') {
+              alert('Error making changes:\\n' + data.message);
+            } else {
+              reloadTable();
+          }},
+          error: function(request, status, message) {
+            alert('Error ' + status + ' making changes: ' + message);
+          }
+  });
+}
+
+
 $(function () {
 
 dv = Slick.Data.DataView();
@@ -333,15 +372,7 @@ grid.onAddNewRow.subscribe(function (e, args) {
   grid.render();
 });
 
-$.ajax({
-  url: '/api/tokens/" (url-encode app) "',
-  type: 'GET',
-  success: function(data) {
-    for (i = 0; i < data.length; i++) {
-      data[i]['id'] = data[i]['name'] + ':' + data[i]['environment'];
-    }
-    dv.setItems(data);
-  }});
+reloadTable();
 
 grid.onSort.subscribe(function(e, args) {
   gridSorter(args.sortCol.field, args.sortAsc, grid, dv);
@@ -360,36 +391,7 @@ dv.onRowsChanged.subscribe(function (e, args) {
 grid.onCellChange.subscribe(function (e, args) {
   var row = dv.getItem(args.row);
   var columns = grid.getColumns();
-  var data = {};
-  // need to skip the delete column on the right
-  for (i = 0; i < columns.length; i++) {
-    console.log(i);
-    if(columns[i]['editor']) {
-       property = columns[i]['field'];
-       data[property] = row[property];
-    }
-  }
-
-  data['path'] = '" app "';
-
-  $.ajax({
-  url: '/token',
-  type: 'PUT',
-  contentType: 'application/json; charset=UTF-8',
-  dataType: 'json',
-  data: JSON.stringify(data),
-  success: function(data) {
-    if(data.status != 'success') {
-      alert('Error adding token:\\n' + data.message);
-    }
-    document.location.reload(true);
-  },
-  error: function(request, status, message) {
-    alert('Error adding token ' + data['name']);
-    document.location.reload(true);
-  }
-  });
-
+  row['changed'] = true;
 });
 
 $('.del').live('click', function() {
@@ -421,6 +423,23 @@ $('.del').live('click', function() {
   }
 });
 
+$('.submitChanges').live('click', function() {
+  var data = dv.getItems();
+  var result = [];
+  for(i = 0; i < data.length; i++) {
+    if (data[i]['changed']) {
+      data[i]['path'] = '"app"';
+      result.push(data[i]);
+    }
+  }
+//  var json = JSON.stringify({'tokens':result});
+//  console.log(json);
+  submitTokens(JSON.stringify(result));
+});
+
+$('.resetChanges').live('click', function() {
+  reloadTable();
+});
 
 })"
 )]]))
