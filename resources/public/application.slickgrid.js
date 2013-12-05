@@ -14,22 +14,21 @@ function AppSlickGrid(path, urlEncodedPath) {
     }
 
     function deleteButtonFormatter(row, cell, value, columnDef, dataContext) {
-        var button = "<input class='del' type='button' id='" + dataContext.id + "' value='delete'>";
+        var button = "<input class='ApplicationDelete' type='button' id='" + dataContext.id + "' value='delete'>";
         return button;
     }
 
-    function sourceFormatter(row, cell, value, columnDef, dataContext) {
+    function appFormatter(row, cell, value, columnDef, dataContext) {
         if(typeof value == 'undefined') {
             return ''
-        } else if(value == '') {
-            return '/';
         } else {
-            return value;
+            var link = "<a href='/application/" + urlEncodedPath + dataContext.name + "'>" + dataContext.name + "</a>";
+            return link;
         }
     }
 
     var columns = [
-        {id: 'application', name: 'Application', field: 'name', width: 800, editor: Slick.Editors.Text, sortable: true},
+        {id: 'application', name: 'Application', field: 'name', width: 800, editor: Slick.Editors.Text, sortable: true, formatter: appFormatter},
         {id: 'description', name: 'Description', field: 'description', width: 200, editor: Slick.Editors.Text},
         {id: 'delete', name: 'Delete', field: 'delete', width: 200, formatter: deleteButtonFormatter}];
 
@@ -61,7 +60,7 @@ function AppSlickGrid(path, urlEncodedPath) {
     }
 
     function submitApps(data) {
-	console.log("Sumitting applications" + data);
+        console.log("Sumitting applications" + data);
         $.ajax({type: 'PUT',
                 url: '/api/applications',
                 //          contentType: 'application/json; charset=UTF-8',
@@ -141,21 +140,20 @@ function AppSlickGrid(path, urlEncodedPath) {
             var name = row['name'];
             var environment = row['environment'];
             var delconf = confirm('Do you really want to delete the '
-				  + name + 'application?');
+                                  + name + 'application?');
             if (delconf) {
-                $.ajax({ url: '/api/applications/' + urlEncodedPath + name
-			 + '/' + environment,
+                $.ajax({ url: '/api/applications/' + urlEncodedPath + name,
                          type: 'DELETE',
                          success: function(data) {
                              if(data.status != 'success') {
-                                 alert('Error deleting ' + name + ':\\n'
-				       + data.message)
+                                 alert('Error deleting ' + name + ':\n'
+                                       + data.message)
                              }
-                             document.location.reload(true);
+                             reloadTable();
                          },
                          error: function(req, status, message) {
                              alert('Error deleting ' +  name);
-                             document.location.reload(true);
+                             reloadTable();;
                          }
                        });
             }

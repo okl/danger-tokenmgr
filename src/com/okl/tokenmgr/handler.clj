@@ -27,6 +27,35 @@
     (denormalize-tokens (get-tokens (url-decode app))))
   (GET "/api/tokens/" []
     (denormalize-tokens (get-tokens "")))
+  (DELETE "/api/applications/:app" [app]
+    (try
+      (if (delete-app app)
+          {:status 200
+           :body {:status "success"}}
+          {:status 200
+           :body {:status "failure" :message "Item not deleted"}})
+        (catch IllegalStateException e
+          {:status 200
+           :body {:status "failure" :message (.getMessage e)}})))
+  (PUT "/api/applications" {body :body}
+    (try
+      (let [apps (json/read-str (slurp body))
+            results (map (fn[app]
+                           (let [path (get app "path")
+                                 name (get app "name")
+                                 pathname (if (empty? path)
+                                            name
+                                            (join "/" [path name]))]
+                             (create-app pathname (get app "description"))))
+                         apps)]
+        (if (every? identity results)
+          {:status 200
+           :body {:status "success"}}
+          {:status 200
+           :body {:status "failure" :message "Some items may not have been updated"}}))
+      (catch IllegalStateException e
+        {:status 200
+         :body {:status "failure" :message (.getMessage e)}})))
   (DELETE "/api/tokens/:pathname/:envt" [pathname envt]
       (try
         (if (delete-value pathname envt)
