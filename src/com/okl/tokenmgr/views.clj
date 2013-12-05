@@ -389,6 +389,38 @@ grid.onCellChange.subscribe(function (e, args) {
     document.location.reload(true);
   }
   });
+
 });
+
+$('.del').live('click', function() {
+  var me = $(this);
+  var id = me.attr('id');
+  var row = dv.getItemById(id);
+  var name = row['name'];
+  var environment = row['environment'];
+  var delconf = confirm('Do you really want to delete the ' + environment +
+                        ' value for the ' + name + 'token?');
+  if (delconf) {
+    $.ajax({ url: '/api/tokens/"
+  ;; need to handle empty app case, as well as non-empty case
+  (if (empty? app)
+    ""
+    (url-encode (str app "/"))) "' + name + '/' + environment,
+             type: 'DELETE',
+             success: function(data) {
+               if(data.status != 'success') {
+                 alert('Error deleting ' + name + ':\\n' + data.message)
+               }
+               document.location.reload(true);
+             },
+             error: function(req, status, message) {
+               alert('Error deleting ' +  name);
+               document.location.reload(true);
+             }
+    });
+  }
+});
+
+
 })"
 )]]))
