@@ -65,6 +65,16 @@
     (dynamic-page ""))
   (GET "/testing/appication/:app" [app]
     (dynamic-page app))
+  (DELETE "/api/tokens/:pathname/:envt" [pathname envt]
+      (try
+        (if (delete-value pathname envt)
+          {:status 200
+           :body {:status "success"}}
+          {:status 200
+           :body {:status "failure" :message "Item not created"}})
+        (catch IllegalStateException e
+          {:status 200
+           :body {:status "failure" :message (.getMessage e)}})))
   (route/resources "")
   (route/not-found "Not Found"))
 

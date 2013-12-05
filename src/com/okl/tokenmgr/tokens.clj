@@ -190,3 +190,22 @@
 
 (defn denormalize-tokens [tokens]
   (apply concat (map denormalize-token tokens)))
+
+(defn delete-value [pathname envt]
+  (log/info (str "Trying to delete " pathname " " envt))
+  (let [full-path (path->full-path pathname)
+        json (:value (.get-item storage full-path))
+        token (json/read-str json)
+        values (get token "values")
+        new-values (into {} (remove #(= envt (first %)) values))
+        new-token {:description (get token "description")
+                   :values new-values
+                   :type "token"}
+        new-json (json/write-str new-token)]
+    (log/info (str "Json is " json))
+    (log/info (str "I changed " values))
+    (log/info (str "into " (apply str new-values)))
+    (log/info new-json)
+    (if (empty? new-values)
+      (.delete storage full-path)
+      (.create storage full-path new-json ""))))
