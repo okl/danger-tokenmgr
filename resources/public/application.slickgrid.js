@@ -20,13 +20,14 @@ function AppSlickGrid(path, urlEncodedPath) {
     }
 
     function appFormatter(row, cell, value, columnDef, dataContext) {
-        if(typeof value == 'undefined') {
-            return ''
-        } else {
-            var pathname = dataContext.name;
-            var name = pathname.substring(path.length);
-            var link = "<a href='/application/" + encodeURIComponent(pathname) + "'>" + name + "</a>";
+        if(value == undefined) {
+            return '';
+        } else if (value.indexOf(path) == 0) {
+            var name = value.substring(path.length);
+            var link = "<a href='/application/" + encodeURIComponent(value) + "'>" + name + "</a>";
             return link;
+        } else {
+	    return value;
         }
     }
 
@@ -131,7 +132,6 @@ function AppSlickGrid(path, urlEncodedPath) {
 
         grid.onCellChange.subscribe(function (e, args) {
             var row = dv.getItem(args.row);
-            var columns = grid.getColumns();
             row['changed'] = true;
         });
 
