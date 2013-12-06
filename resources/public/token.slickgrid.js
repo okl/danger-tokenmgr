@@ -145,7 +145,13 @@ function TokenSlickGrid(path, urlEncodedPath) {
             var delconf = confirm('Do you really want to delete the ' + environment +
                                   ' value for the ' + name + 'token?');
             if (delconf) {
-                $.ajax({ url: '/api/tokens/' + urlEncodedPath + name + '/' + environment,
+                var pathname;
+                if( urlEncodedPath == '') {
+                    pathname = name;
+                } else {
+                    pathname = urlEncodedPath + '%2f' + name;
+                }
+                $.ajax({ url: '/api/tokens/' + pathname + '/' + environment,
                          type: 'DELETE',
                          success: function(data) {
                              if(data.status != 'success') {
