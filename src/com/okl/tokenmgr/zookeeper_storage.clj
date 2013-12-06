@@ -4,18 +4,24 @@
   (:require [zookeeper :as zk]))
 
 (def zk-string "127.0.0.1:2181")
+(def my-connection (atom (zk/connect zk-string)))
+
+;; obtain a client; will reconnect if the client has closed
+(defn- get-client []
+  (if (= :CLOSED (zk/state @my-connection))
+    (swap! my-connection (fn[x] (zk/connect zk-string))))
+  @my-connection)
+
 
 ;; function for running a zookeeper operation
 ;; private function
 (defn- zk-op [op path]
-  (let [client (zk/connect zk-string)
-        return (op client path)]
-    (zk/close client)
-    return))
+  (let [client (get-client)]
+    (op client path)))
 
 ;; function for setting the data in zookeeper
 (defn- zk-set [path value]
-  (let [client (zk/connect zk-string)
+  (let [client ()
         version (:version (zk/exists client path))
         data (if value
                (.getBytes value "UTF-8")
@@ -48,7 +54,7 @@
       (zk-op zk/delete-all path)))
 
   (create [this path data autocreate-message]
-    (let [client (zk/connect zk-string)
+    (let [client (get-client)
           last-slash (.lastIndexOf path "/")
           parent (subs path 0 last-slash)]
       (if (and (pos? (count parent))
