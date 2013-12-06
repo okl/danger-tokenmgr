@@ -180,7 +180,6 @@
   (let [name (:name token)
         description (:description token)]
     (map (fn [x]
-           (log/info (str "EEE token has value "  (get (:values token) x)))
            {:name name
             :description description
             :environment x
