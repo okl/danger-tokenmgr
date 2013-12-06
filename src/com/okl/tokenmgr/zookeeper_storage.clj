@@ -21,7 +21,7 @@
 
 ;; function for setting the data in zookeeper
 (defn- zk-set [path value]
-  (let [client ()
+  (let [client (get-client)
         version (:version (zk/exists client path))
         data (if value
                (.getBytes value "UTF-8")
