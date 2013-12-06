@@ -23,8 +23,8 @@ function AppSlickGrid(path, urlEncodedPath) {
         if(typeof value == 'undefined') {
             return ''
         } else {
-	    var pathname = dataContext.name;
-	    var name = pathname.substring(path.length);
+            var pathname = dataContext.name;
+            var name = pathname.substring(path.length);
             var link = "<a href='/application/" + encodeURIComponent(pathname) + "'>" + name + "</a>";
             return link;
         }
@@ -39,8 +39,7 @@ function AppSlickGrid(path, urlEncodedPath) {
         editable: true,
         enableAddRow: false,
         enableCellNavigation: true,
-        autoEdit: false,
-        autoHeight: true
+        autoEdit: false
     };
 
     var loadingIndicator = null;

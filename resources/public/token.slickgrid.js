@@ -40,8 +40,7 @@ function TokenSlickGrid(path, urlEncodedPath) {
         editable: true,
         enableAddRow: false,
         enableCellNavigation: true,
-        autoEdit: false,
-        autoHeight: true
+        autoEdit: false
     };
 
     var loadingIndicator = null;
