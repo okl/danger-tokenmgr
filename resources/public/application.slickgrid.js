@@ -144,7 +144,7 @@ function AppSlickGrid(path, urlEncodedPath) {
             var delconf = confirm('Do you really want to delete the '
                                   + name + 'application?');
             if (delconf) {
-                $.ajax({ url: '/api/applications/' + urlEncodedPath + name,
+                $.ajax({ url: '/api/applications/' + encodeURIComponent(name),
                          type: 'DELETE',
                          success: function(data) {
                              if(data.status != 'success') {
