@@ -21,7 +21,6 @@
   (GET "/api/applications/" []
     (get-apps ""))
   (GET "/api/applications/:app" [app]
-    (log/info (str "app is " app))
     (get-apps app))
   (GET "/api/tokens/:app" [app]
     (denormalize-tokens (get-tokens (url-decode app))))
