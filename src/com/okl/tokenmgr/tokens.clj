@@ -8,6 +8,13 @@
 (def base-path "/applications")
 (def storage (get-container))
 
+(defn- read-json-str [data]
+  "try to read json data, and error with the bad json if there's an error"
+  (try
+    (json/read-str data)
+    (catch Exception e
+      (throw (IllegalStateException. (str "Error processsing " data ":\n" (.getMessage e)))))))
+
 (defn- coalesce-map [map1 map2]
   "recursively merge maps"
   (merge-with
@@ -24,7 +31,7 @@
   (let [value (:value data)]
     (if (empty? value)
       ""
-      (get (json/read-str value) "type"))))
+      (get (read-json-str value) "type"))))
 
 (defn- token? [data]
   "returns true if the json provided is of type token"
@@ -32,7 +39,10 @@
 
 (defn- app? [data]
   "returns true if the json provided is of type application"
-  (= "application" (get-type data)))
+  (try
+    (= "application" (get-type data))
+    (catch IllegalStateException e
+       (throw (IllegalStateException. (str "Unable to determine if " data " is an app:\n" (.getMessage e)))))))
 
 (defn- path->full-path [path]
   "adds the base path back in"
@@ -62,7 +72,7 @@
         item (.get-item storage (path->full-path app))
         old-json (if (empty? item)
                    {}
-                   (walk/keywordize-keys (json/read-str (:value item))))
+                   (walk/keywordize-keys (read-json-str (:value item))))
         json (json/write-str
               {:type "application"
                :description description})]
@@ -86,7 +96,7 @@
         item (.get-item storage full-path)
         json (if (empty? item)
                {}
-               (walk/keywordize-keys (json/read-str (:value item))))
+               (walk/keywordize-keys (read-json-str (:value item))))
         new-json {:description description
                   :values {(keyword good-envt) {:value value :source path}}
                   :type "token"}
@@ -104,7 +114,7 @@
   (let [full-path (path->full-path path)]
   (map
    #(hash-map :name (subs (get % :name) (inc (count base-path)))
-              :description (get (json/read-str (get % :value)) "description"))
+              :description (get (read-json-str (get % :value)) "description"))
    (filter
     app?
     (.subtree storage full-path)))))
@@ -125,8 +135,8 @@
          (map
           #(let [pathname (:name %)
                  name (subs pathname (inc (.lastIndexOf pathname "/")))
-                 description (get (json/read-str (:value %)) "description")
-                 values (get (json/read-str (:value %)) "values")]
+                 description (get (read-json-str (:value %)) "description")
+                 values (get (read-json-str (:value %)) "values")]
              {:name name
               :description description
               :values values
@@ -194,7 +204,7 @@
   (log/info (str "Trying to delete " pathname " " envt))
   (let [full-path (path->full-path pathname)
         json (:value (.get-item storage full-path))
-        token (json/read-str json)
+        token (read-json-str json)
         values (get token "values")
         new-values (into {} (remove #(= envt (first %)) values))
         new-token {:description (get token "description")
