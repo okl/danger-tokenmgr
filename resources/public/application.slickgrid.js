@@ -48,7 +48,7 @@ function AppSlickGrid(path, urlEncodedPath) {
 
     function reloadTable() {
         $.ajax({
-            url: '/api/applications/' + urlEncodedPath,
+            url: '/tokenmgr/api/applications/' + urlEncodedPath,
             type: 'GET',
             success: function(data) {
                 for (i = 0; i < data.length; i++) {
@@ -65,7 +65,7 @@ function AppSlickGrid(path, urlEncodedPath) {
     function submitApps(data) {
         console.log("Sumitting applications" + data);
         $.ajax({type: 'PUT',
-                url: '/api/applications',
+                url: '/tokenmgr/api/applications',
                 //          contentType: 'application/json; charset=UTF-8',
                 contentType: 'text/plain',
                 dataType: 'json',
@@ -144,7 +144,7 @@ function AppSlickGrid(path, urlEncodedPath) {
             var delconf = confirm('Do you really want to delete the '
                                   + name + 'application?');
             if (delconf) {
-                $.ajax({ url: '/api/applications/' + encodeURIComponent(name),
+                $.ajax({ url: '/tokenmgr/api/applications/' + encodeURIComponent(name),
                          type: 'DELETE',
                          success: function(data) {
                              if(data.status != 'success') {

@@ -37,7 +37,7 @@
   [:head
    [:title title]
    [:script {:src
-             "//ajax.googleapis.com/ajax/libs/jquery/1.4.3/jquery.min.js"}]
+             "https://ajax.googleapis.com/ajax/libs/jquery/1.4.3/jquery.min.js"}]
    [:script {:src "http://malsup.github.com/jquery.form.js"}]
    [:link {:rel "stylesheet"
            :href "/slick-grid/slick.grid.css"
@@ -53,7 +53,7 @@
    [:script {:src "/slick-grid/plugins/slick.cellrangeselector.js"}]
    [:script {:src "/slick-grid/plugins/slick.rowselectionmodel.js"}]
    [:script {:src "/slick-grid/slick.dataview.js"}]
-   [:script {:src "//code.jquery.com/ui/1.10.3/jquery-ui.js"}]
+   [:script {:src "https://code.jquery.com/ui/1.10.3/jquery-ui.js"}]
    [:script {:src "/token.slickgrid.js"}]
    [:script {:src "/application.slickgrid.js"}]
    [:script {:type "text/javascript"}

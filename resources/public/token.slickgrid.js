@@ -48,7 +48,7 @@ function TokenSlickGrid(path, urlEncodedPath) {
 
     function reloadTable() {
         $.ajax({
-            url: '/api/tokens/' + urlEncodedPath,
+            url: '/tokenmgr/api/tokens/' + urlEncodedPath,
             type: 'GET',
             success: function(data) {
                 for (i = 0; i < data.length; i++) {
@@ -65,7 +65,7 @@ function TokenSlickGrid(path, urlEncodedPath) {
     function submitTokens(data) {
         console.log("Sumitting tokens" + data);
         $.ajax({type: 'PUT',
-                url: '/api/tokens',
+                url: '/tokenmgr/api/tokens',
                 //          contentType: 'application/json; charset=UTF-8',
                 contentType: 'text/plain',
                 dataType: 'json',
@@ -151,7 +151,7 @@ function TokenSlickGrid(path, urlEncodedPath) {
                 } else {
                     pathname = urlEncodedPath + '%2f' + name;
                 }
-                $.ajax({ url: '/api/tokens/' + pathname + '/' + environment,
+                $.ajax({ url: '/tokenmgr/api/tokens/' + pathname + '/' + environment,
                          type: 'DELETE',
                          success: function(data) {
                              if(data.status != 'success') {
