@@ -24,7 +24,7 @@ function AppSlickGrid(path, urlEncodedPath) {
             return '';
         } else if (value.indexOf(path) == 0) {
             var name = value.substring(path.length);
-            var link = "<a href='/application/" + encodeURIComponent(value) + "'>" + name + "</a>";
+            var link = "<a href='/tokenmgr/application/" + encodeURIComponent(value) + "'>" + name + "</a>";
             return link;
         } else {
 	    return value;
