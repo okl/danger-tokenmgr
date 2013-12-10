@@ -151,7 +151,7 @@ function TokenSlickGrid(path, urlEncodedPath) {
                 } else {
                     pathname = urlEncodedPath + '%2f' + name;
                 }
-                $.ajax({ url: '/tokenmgr/api/tokens/' + pathname + '/' + environment,
+                $.ajax({ url: '/tokenmgr/api/tokens/' + encodeURIComponent(pathname) + '/' + environment,
                          type: 'DELETE',
                          success: function(data) {
                              if(data.status != 'success') {
