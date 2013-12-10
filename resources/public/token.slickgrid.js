@@ -1,3 +1,8 @@
+/*
+ * This library makes slick grid tables for token types
+ * @author Eric Sayle
+ */
+
 function TokenSlickGrid(path, urlEncodedPath) {
 
     var grid;
