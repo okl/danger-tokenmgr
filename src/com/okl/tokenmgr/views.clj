@@ -45,6 +45,9 @@
    [:link {:rel "stylesheet"
            :href "/slick-grid/css/smoothness/jquery-ui-1.8.16.custom.css"
            :type "text/css"}]
+   [:link {:rel "stylesheet"
+           :href "/danger-tokenmgr.css"
+           :type "text/css"}]
    [:script {:src "/jquery.event.drag-2.0.min.js"}]
    [:script {:src "/slick-grid/slick.core.js"}]
    [:script {:src "/slick-grid/slick.grid.js"}]
