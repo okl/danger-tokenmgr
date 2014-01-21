@@ -15,7 +15,7 @@ to have [zookeeper][2] installed, configured, and running.
 
 ## Running
 
-First, edit zookeeper-storage.clj to match the zookeeper url to the
+First, edit zookeeper_storage.clj to match the zookeeper url to the
 correct one for your environment.
 
 To start a web server for the application, run:
