@@ -15,7 +15,6 @@ to have [zookeeper][2] installed, configured, and running.
 
 ## Running
 
-<<<<<<< HEAD
 First, create conf/tokenmgr.yml (see conf/tokenmgr.yml.sample) as
 appropriate for your environment.
 
@@ -25,7 +24,6 @@ Next you must properly initialize the SlickGrid submodule. In the top-level dire
 =======
 First, edit zookeeper_storage.clj to match the zookeeper url to the
 correct one for your environment.
->>>>>>> 91d3f9d8639f9532aa912ad526ff7832fb094878
 
 To start a web server for the application, run:
 
