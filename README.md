@@ -25,7 +25,8 @@ First, create conf/tokenmgr.yml (see conf/tokenmgr.yml.sample) as
 appropriate for your environment. If you're running the vagrant vm,
 this is a no-op.
 
-Next, you must properly initialize the SlickGrid submodule. In the top-level directory, run:
+Next, you must properly initialize the SlickGrid submodule. In the
+top-level directory, run:
  - git submodule init
  - git submodule update
 
