@@ -3,4 +3,4 @@ storage:
   port: 2181
 
 web:
-  prefix:
+  prefix: testprefix
