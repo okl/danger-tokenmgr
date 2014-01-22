@@ -26,8 +26,8 @@ appropriate for your environment. If you're running the vagrant vm,
 this is a no-op.
 
 Next, you must properly initialize the SlickGrid submodule. In the top-level directory, run:
- - git submodule init
- - git submodule update
+    git submodule init
+    git submodule update
 
 To start a web server for the application, run:
 
