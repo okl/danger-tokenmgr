@@ -4,7 +4,8 @@
    :date "01/17/2014"}
   (:require [clojure.tools.logging :as log]
             [clj-yaml.core :as yaml]
-            [roxxi.utils.collections :as coll]))
+            [roxxi.utils.collections :as coll]
+            [roxxi.utils.print :refer [print-expr]]))
 
 (defrecord StorageConfig [host port])
 
@@ -14,8 +15,8 @@
   (yaml/parse-string (slurp filename)))
 
 (defn- yaml-configuration-for-name [configuration]
-  (coll/extract-map configuration
-                    :key-extractor #(:name %)))
+  (coll/project-map configuration
+                    :key-xform name))
 
 (defn- yaml-file->storage-config [filename]
   (let [configurations (yaml-configuration-for-name (read-yaml-configuration filename))]
@@ -35,9 +36,9 @@
 (deftype YamlConfigurationBroker [yaml-file]
   TokenmgrConfigurationBroker
   (storage-configuration [_]
-    (yaml-file->storage-config yaml-file) "storage")
+    (get (yaml-file->storage-config yaml-file) "storage"))
   (web-configuration [_]
-    (yaml-file->web-config yaml-file) "web"))
+    (get (yaml-file->web-config yaml-file) "web")))
 
 (defn make-yaml-config-broker [yaml-file]
   (YamlConfigurationBroker. yaml-file))
