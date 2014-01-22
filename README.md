@@ -1,7 +1,7 @@
 # danger-tokenmgr
 
 This is an application designed to manage token replacement for
-configuration files. This project uses zooekeeper as a
+configuration files. This project uses zookeeper as a
 backend. There's a compojure app designed for managing the values of
 the tokens, and a command line driver for performing the replacement.
 
@@ -15,8 +15,12 @@ to have [zookeeper][2] installed, configured, and running.
 
 ## Running
 
-First, edit zookeeper-storage.clj to match the zookeeper url to the
-correct one for your environment.
+First, create conf/tokenmgr.yml (see conf/tokenmgr.yml.sample) as
+appropriate for your environment.
+
+Next you must properly initialize the SlickGrid submodule. In the top-level directory, run:
+	git submodule init
+	git submodule update
 
 To start a web server for the application, run:
 
