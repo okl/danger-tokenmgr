@@ -9,7 +9,8 @@
                  [org.clojure/tools.logging "0.2.6"]
                  [org.clojure/tools.cli "0.2.4"]
                  [org.slf4j/slf4j-simple "1.7.5"]
-                 [roxxi/clojure-common-utils "0.0.13"]]
+                 [roxxi/clojure-common-utils "0.0.13"]
+                 [clj-yaml "0.4.0"]]
   :plugins [[lein-ring "0.8.5"]]
   :ring {:handler com.okl.tokenmgr.handler/app}
   :main com.okl.tokenmgr.filter-file

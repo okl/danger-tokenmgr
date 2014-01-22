@@ -1,17 +1,22 @@
 (ns com.okl.tokenmgr.zookeeper-storage
   (:use [clojure.string :only (join)]
         com.okl.tokenmgr.storage)
-  (:require [zookeeper :as zk]))
+  (:require [zookeeper :as zk]
+            [com.okl.tokenmgr.config :as config]))
 
-(def zk-string "127.0.0.1:2181")
-(def my-connection (atom (zk/connect zk-string)))
+(defn- zk-string []
+  (let [broker (config/make-yaml-config-broker "conf/tokenmgr.yml")
+        config (.storage-configuration broker)
+        string (join ":" [(:host config) (:port config)])]
+    string))
+
+(def my-connection (atom (zk/connect (zk-string))))
 
 ;; obtain a client; will reconnect if the client has closed
 (defn- get-client []
   (if (= :CLOSED (zk/state @my-connection))
-    (swap! my-connection (fn[x] (zk/connect zk-string))))
+    (swap! my-connection (fn[x] (zk/connect (zk-string)))))
   @my-connection)
-
 
 ;; function for running a zookeeper operation
 ;; private function

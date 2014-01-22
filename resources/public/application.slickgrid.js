@@ -2,7 +2,7 @@
  * Javascript library to create knowlegeable slickGrids with token info in them
  */
 
-function AppSlickGrid(path, urlEncodedPath) {
+function AppSlickGrid(path, urlEncodedPath, prefix) {
 
     var grid;
     var dv;
@@ -24,7 +24,7 @@ function AppSlickGrid(path, urlEncodedPath) {
             return '';
         } else if (value.indexOf(path) == 0) {
             var name = value.substring(path.length);
-            var link = "<a href='/tokenmgr/application/" + encodeURIComponent(value) + "'>" + name + "</a>";
+            var link = "<a href='" + prefix + "/application/" + encodeURIComponent(value) + "'>" + name + "</a>";
             return link;
         } else {
 	    return value;
@@ -48,7 +48,7 @@ function AppSlickGrid(path, urlEncodedPath) {
 
     function reloadTable() {
         $.ajax({
-            url: '/tokenmgr/api/applications/' + urlEncodedPath,
+            url: prefix + '/api/applications/' + urlEncodedPath,
             type: 'GET',
             success: function(data) {
                 for (i = 0; i < data.length; i++) {
@@ -65,7 +65,7 @@ function AppSlickGrid(path, urlEncodedPath) {
     function submitApps(data) {
         console.log("Sumitting applications" + data);
         $.ajax({type: 'PUT',
-                url: '/tokenmgr/api/applications',
+                url: prefix + '/api/applications',
                 //          contentType: 'application/json; charset=UTF-8',
                 contentType: 'text/plain',
                 dataType: 'json',
@@ -144,7 +144,7 @@ function AppSlickGrid(path, urlEncodedPath) {
             var delconf = confirm('Do you really want to delete the '
                                   + name + 'application?');
             if (delconf) {
-                $.ajax({ url: '/tokenmgr/api/applications/' + encodeURIComponent(name),
+                $.ajax({ url: prefix + '/api/applications/' + encodeURIComponent(name),
                          type: 'DELETE',
                          success: function(data) {
                              if(data.status != 'success') {
