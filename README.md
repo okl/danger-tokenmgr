@@ -7,11 +7,17 @@ the tokens, and a command line driver for performing the replacement.
 
 ## Prerequisites
 
-You will need [Leiningen][1] 1.7.0 or above installed. You also need
-to have [zookeeper][2] installed, configured, and running.
+You will need [Leiningen][1] 1.7.0 or above installed.
+
+You also need to have [zookeeper][2] installed, configured, and
+running. Alternatively, you can set up a [vagrant][3] instance using
+the box at s3://okl-danger/zookeeper/zookeeper.box (tar zxf it into
+~/.vagrant.d/boxes/) and the Vagrantfile at
+s3://okl-dnager/zookeeper/Vagrantfile (put it in ~, then run 'vagrant up').
 
 [1]: https://github.com/technomancy/leiningen
 [2]: http://zookeeper.apache.org
+[3]: http://www.vagrantup.com/
 
 ## Running
 
@@ -21,9 +27,6 @@ appropriate for your environment.
 Next you must properly initialize the SlickGrid submodule. In the top-level directory, run:
 	git submodule init
 	git submodule update
-=======
-First, edit zookeeper_storage.clj to match the zookeeper url to the
-correct one for your environment.
 
 To start a web server for the application, run:
 

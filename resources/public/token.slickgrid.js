@@ -3,7 +3,7 @@
  * @author Eric Sayle
  */
 
-function TokenSlickGrid(path, urlEncodedPath) {
+function TokenSlickGrid(path, urlEncodedPath, prefix) {
 
     var grid;
     var dv;
@@ -53,7 +53,7 @@ function TokenSlickGrid(path, urlEncodedPath) {
 
     function reloadTable() {
         $.ajax({
-            url: '/tokenmgr/api/tokens/' + urlEncodedPath,
+            url: prefix + '/api/tokens/' + urlEncodedPath,
             type: 'GET',
             success: function(data) {
                 for (i = 0; i < data.length; i++) {
@@ -70,7 +70,7 @@ function TokenSlickGrid(path, urlEncodedPath) {
     function submitTokens(data) {
         console.log("Sumitting tokens" + data);
         $.ajax({type: 'PUT',
-                url: '/tokenmgr/api/tokens',
+                url: prefix + '/api/tokens',
                 //          contentType: 'application/json; charset=UTF-8',
                 contentType: 'text/plain',
                 dataType: 'json',
@@ -156,7 +156,7 @@ function TokenSlickGrid(path, urlEncodedPath) {
                 } else {
                     pathname = urlEncodedPath + '%2f' + name;
                 }
-                $.ajax({ url: '/tokenmgr/api/tokens/' + pathname + '/' + environment,
+                $.ajax({ url: prefix + '/api/tokens/' + pathname + '/' + environment,
                          type: 'DELETE',
                          success: function(data) {
                              if(data.status != 'success') {

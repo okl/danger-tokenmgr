@@ -8,8 +8,15 @@
             [ring.middleware.json :as middleware]
             [clojure.data.json :as json]
             [clojure.tools.logging :as log]
-            [roxxi.utils.print :refer :all]))
+            [roxxi.utils.print :refer :all]
+            [com.okl.tokenmgr.config :as config]
+            [clojure.string :as str]))
 (use '[clojure.string :only (join)])
+
+(defn- delimiter []
+  (let [broker (config/make-yaml-config-broker "conf/tokenmgr.yml")
+        config (.web-configuration broker)]
+    (:delimiter config)))
 
 (defroutes app-routes
   (GET "/" []
@@ -26,16 +33,17 @@
     (denormalize-tokens (get-tokens (url-decode app))))
   (GET "/api/tokens/" []
     (denormalize-tokens (get-tokens "")))
-  (DELETE "/api/applications/:app" [app]
+  (DELETE "/api/applications/:delimited-app" [delimited-app]
     (try
-      (if (delete-app app)
+      (let [app (str/replace delimited-app (delimiter) "/")]
+        (if (delete-app app)
           {:status 200
            :body {:status "success"}}
           {:status 200
-           :body {:status "failure" :message "Item not deleted"}})
-        (catch IllegalStateException e
-          {:status 200
-           :body {:status "failure" :message (.getMessage e)}})))
+           :body {:status "failure" :message "Item not deleted"}}))
+      (catch IllegalStateException e
+        {:status 200
+         :body {:status "failure" :message (.getMessage e)}})))
   (PUT "/api/applications" {body :body}
     (try
       (let [apps (json/read-str (slurp body))
@@ -55,13 +63,14 @@
       (catch IllegalStateException e
         {:status 200
          :body {:status "failure" :message (.getMessage e)}})))
-  (DELETE "/api/tokens/:pathname/:envt" [pathname envt]
+  (DELETE "/api/tokens/:delimited-pathname/:envt" [delimited-pathname envt]
       (try
-        (if (delete-value pathname envt)
-          {:status 200
-           :body {:status "success"}}
-          {:status 200
-           :body {:status "failure" :message "Item not created"}})
+        (let [pathname (str/replace delimited-pathname (delimiter) envt)]
+          (if (delete-value pathname envt)
+            {:status 200
+             :body {:status "success"}}
+            {:status 200
+             :body {:status "failure" :message "Item not created"}}))
         (catch IllegalStateException e
           {:status 200
            :body {:status "failure" :message (.getMessage e)}})))
