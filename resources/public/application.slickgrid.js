@@ -2,7 +2,7 @@
  * Javascript library to create knowlegeable slickGrids with token info in them
  */
 
-function AppSlickGrid(path, urlEncodedPath, prefix) {
+function AppSlickGrid(path, urlEncodedPath, prefix, delimiter) {
 
     var grid;
     var dv;
@@ -144,7 +144,7 @@ function AppSlickGrid(path, urlEncodedPath, prefix) {
             var delconf = confirm('Do you really want to delete the '
                                   + name + 'application?');
             if (delconf) {
-                $.ajax({ url: prefix + '/api/applications/' + encodeURIComponent(name),
+                $.ajax({ url: prefix + '/api/applications/' + encodeURIComponent(name.replace('/', delimiter)),
                          type: 'DELETE',
                          success: function(data) {
                              if(data.status != 'success') {

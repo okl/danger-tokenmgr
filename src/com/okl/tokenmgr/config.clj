@@ -9,7 +9,7 @@
 
 (defrecord StorageConfig [host port])
 
-(defrecord WebConfig [prefix])
+(defrecord WebConfig [prefix delimiter])
 
 (defn- read-yaml-configuration [filename]
   (yaml/parse-string (slurp filename)))
@@ -27,7 +27,8 @@
 (defn- yaml-file->web-config [filename]
   (let [configurations (yaml-configuration-for-name (read-yaml-configuration filename))]
     (coll/project-map configurations
-                      :value-xform #(->WebConfig (:prefix %)))))
+                      :value-xform #(->WebConfig (:prefix %)
+                                                 (:delimiter %)))))
 
 (defprotocol TokenmgrConfigurationBroker
   (storage-configuration [_] "Returns a StorageConfig object for the storage")

@@ -11,6 +11,11 @@
         config (.web-configuration broker)]
     (:prefix config)))
 
+(defn- delimiter []
+  (let [broker (config/make-yaml-config-broker "conf/tokenmgr.yml")
+        config (.web-configuration broker)]
+    (:delimiter config)))
+
 (defn- path->pretty-path [path]
   (str "/" path))
 
@@ -96,10 +101,10 @@
       [:input {:type "submit" :class "AppSubmitChanges" :value "Submit Changes"}]
       [:input {:type "submit" :class "AppResetChanges" :value "Reset Changes"}]
       [:script {:type "text/javascript"}
-       (str "var appGrid = new AppSlickGrid('" app "', '"url-encoded-app "', '" (prefix) "');")]
+       (str "var appGrid = new AppSlickGrid('" app "', '"url-encoded-app "', '" (prefix) "', '" (delimiter) "');")]
       [:div {:id "tokendiv" :style "width:1200px;height:300px;"} ""]
       [:input {:type "submit" :class "TokenAddNewRow" :value "Add New Row"}]
       [:input {:type "submit" :class "TokenSubmitChanges" :value "Submit Changes"}]
       [:input {:type "submit" :class "TokenResetChanges" :value "Reset Changes"}]
       [:script {:type "text/javascript"}
-       (str "var tokenGrid = new TokenSlickGrid('" app "', '"url-encoded-app "', '" (prefix) "');")]])))
+       (str "var tokenGrid = new TokenSlickGrid('" app "', '"url-encoded-app "', '" (prefix) "', '" (delimiter) "');")]])))
