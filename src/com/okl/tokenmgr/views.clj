@@ -49,7 +49,7 @@
    [:title title]
    [:script {:src
              "https://ajax.googleapis.com/ajax/libs/jquery/1.4.3/jquery.min.js"}]
-   [:script {:src "https://malsup.github.com/jquery.form.js"}]
+   [:script {:src "http://malsup.github.com/jquery.form.js"}]
    [:link {:rel "stylesheet"
            :href "/slick-grid/slick.grid.css"
            :type "text/css"}]
