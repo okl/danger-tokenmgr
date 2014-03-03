@@ -32,7 +32,6 @@
                (.getBytes value "UTF-8")
                value)
         result (zk/set-data client path data version)]
-    (zk/close client)
     result))
 
 (deftype ZookeeperStorageContainer []
@@ -66,7 +65,6 @@
                (not (zk-op zk/exists parent)))
         (.create this parent autocreate-message autocreate-message))
       (zk/create client path :persistent? true)
-      (zk/close client)
       (zk-set path data)))
 
   (subtree [this path]

@@ -7,7 +7,7 @@
                  [ring/ring-json "0.2.0"]
                  [org.clojure/data.json "0.2.3"]
                  [org.clojure/tools.logging "0.2.6"]
-                 [org.clojure/tools.cli "0.2.4"]
+                 [org.clojure/tools.cli "0.3.1"]
                  [org.slf4j/slf4j-simple "1.7.5"]
                  [roxxi/clojure-common-utils "0.0.13"]
                  [clj-yaml "0.4.0"]

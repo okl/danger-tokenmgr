@@ -3,7 +3,8 @@
             [clojure.tools.logging :as log]
             [clojure.string :as string]
             [com.okl.tokenmgr.tokens :refer :all]
-            [clojure.tools.cli :refer [parse-opts]]))
+            [clojure.tools.cli :refer [parse-opts]]
+            [clojure-csv.core :as csv]))
 
 (defn- process-line [line tokens]
   (log/trace (str "Attempting to process line " line))
@@ -88,27 +89,56 @@
     :assoc-fn (fn [previous key val]
                 (merge previous val))]
    ["-d" "--delimiter" "Character for delimiter in csv-related operations"
-    :default \tab
+    :default "\t"
     :valiate [#(= 1 (count %))]]])
 
+(defn- cli-fn [parsed-opts req-arg-cnt]
+  (let [my-args (rest (:arguments parsed-opts))]
+    (log/debug (str "args are " my-args))
+    (if (not (= (count my-args) req-arg-cnt))
+      (usage (:summary parsed-opts))
+      my-args)))
+
+
+(defn- store-token [app header row]
+  (let [token (zipmap header row)
+        name (get token "key_name")
+        description (get token "description")]
+    (log/debug (str "processing " token))
+    (doseq [envt (keys token)]
+      (log/debug (str "processing token " name " with envt " envt))
+      (if (not (or (= envt "key_name")
+                   (= envt "description")
+                   (= envt "id")
+                   (= envt "module")))
+        (create-token
+         (string/join "/" [app name])
+         description
+         envt
+         (get token envt))))))
+
 (defn- do-filter [parsed-opts]
-  (let [args (:arguments parsed-opts)]
-    (log/debug (str "found " (count args) " args: " args))
-    (if (not (= (count args) 4))
-      (usage (:summary parsed-opts)))
-    (let [[app envt dir] (rest args) ; skipping the filter argument
-          cli-tokens (:token (:options parsed-opts))
-          tokens (get-token-values app envt cli-tokens)
-          tokens (process-token-values tokens)]
-      (process-dir dir tokens))))
+  (let [[app envt dir] (cli-fn parsed-opts 3)
+        cli-tokens (:token (:options parsed-opts))
+        tokens (get-token-values app envt cli-tokens)
+        tokens (process-token-values tokens)]
+    (process-dir dir tokens)))
+
+(defn- do-load [parsed-opts]
+  (let [[file app] (cli-fn parsed-opts 2)
+        file-contents (slurp file)
+        csv (csv/parse-csv file-contents
+                           :delimiter (first (:delimiter (:options parsed-opts))))
+        ; first row is column headers
+        header (first csv)
+        token-rows (rest csv)]
+    (doseq [row token-rows]
+      (store-token app header row))))
 
 (defn- do-import [parsed-opts]
   nil)
 
 (defn- do-export [parsed-opts]
-  nil)
-
-(defn- do-load [parsed-opts]
   nil)
 
 (defn -main  [& args]
