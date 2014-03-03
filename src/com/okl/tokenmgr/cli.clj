@@ -3,7 +3,7 @@
             [clojure.tools.logging :as log]
             [clojure.string :as string]
             [com.okl.tokenmgr.tokens :refer :all]
-            [clojure.tools.cli :refer [cli]]))
+            [clojure.tools.cli :refer [parse-opts]]))
 
 (defn- process-line [line tokens]
   (log/trace (str "Attempting to process line " line))
@@ -68,28 +68,57 @@
         value (second (string/split arg #"="))]
     {var value}))
 
-(defn- usage [usage]
-  (println usage)
+(def help-str
+  (str "Arguments: filter app evnt dir -- filters .tmpl files replacing tokens "
+       "with values\n\n"
+       "           load path_to_csv app -- loads in a new csv into a specified "
+       "application\n\n"
+       "           export path_to_csv -- exports the entire repository into a "
+       "csv file\n\n"
+       "           import path_to_csv -- loads the entire repository from a "
+       "csv file"))
+
+(defn- usage [info]
+  (println (str help-str "\n\nAdditonal parameters\n" info))
   (System/exit 1))
 
-(def help-str
-  (str "This program will take .tmpl filters, and replace the __TOKENS__ with "
-       "values from our token store.\n\nThere are 3 requrired arguments: "
-       "app-name, environment, and dir"))
+(def cli-opts
+  [["-t" "--token" "Token definitions, TOKEN=VAL"
+    :parse-fn arg->map
+    :assoc-fn (fn [previous key val]
+                (merge previous val))]
+   ["-d" "--delimiter" "Character for delimiter in csv-related operations"
+    :default \tab
+    :valiate [#(= 1 (count %))]]])
+
+(defn- do-filter [parsed-opts]
+  (let [args (:arguments parsed-opts)]
+    (log/info (str "found " (count args) " args: " args))
+    (if (not (= (count args) 4))
+      (usage (:summary parsed-opts)))
+    (let [[app envt dir] (rest args) ; skipping the filter argument
+          cli-tokens (:token (:options parsed-opts))
+          tokens (get-token-values app envt cli-tokens)
+          tokens (process-token-values tokens)]
+      (process-dir dir tokens))))
+
+(defn- do-import [parsed-opts]
+  nil)
+
+(defn- do-export [parsed-opts]
+  nil)
+
+(defn- do-load [parsed-opts]
+  nil)
 
 (defn -main  [& args]
-  (let [[cli-tokens args help]
-        (cli args
-             help-str
-             ["--token" "Token definitions, TOKEN=VAL"
-              :parse-fn arg->map
-              :assoc-fn (fn [previous key val]
-                          (merge previous val))])]
-    (if-not (= 3 (count args))
-      (usage help)
-      (let [app (first args)
-            envt (second args)
-            dir (second (rest args)) ;; aka third
-            tokens (get-token-values app envt cli-tokens)
-            tokens (process-token-values tokens)]
-        (process-dir dir tokens)))))
+  (let [parsed-opts (parse-opts args cli-opts)
+        parsed-args (:arguments parsed-opts)]
+    (if (:errors parsed-opts)
+      (usage (:summary parsed-opts)))
+    (cond
+     (= (first parsed-args) "filter") (do-filter parsed-opts)
+     (= (first parsed-args) "load") (do-load parsed-opts)
+     (= (first parsed-args) "export") (do-export parsed-opts)
+     (= (first parsed-args) "import") (do-import parsed-opts)
+     :else (usage (:summary parsed-opts)))))
