@@ -93,7 +93,7 @@
 
 (defn- do-filter [parsed-opts]
   (let [args (:arguments parsed-opts)]
-    (log/info (str "found " (count args) " args: " args))
+    (log/debug (str "found " (count args) " args: " args))
     (if (not (= (count args) 4))
       (usage (:summary parsed-opts)))
     (let [[app envt dir] (rest args) ; skipping the filter argument
