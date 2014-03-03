@@ -10,10 +10,11 @@
                  [org.clojure/tools.cli "0.2.4"]
                  [org.slf4j/slf4j-simple "1.7.5"]
                  [roxxi/clojure-common-utils "0.0.13"]
-                 [clj-yaml "0.4.0"]]
+                 [clj-yaml "0.4.0"]
+                 [clojure-csv/clojure-csv "2.0.1"]]
   :plugins [[lein-ring "0.8.5"]]
   :ring {:handler com.okl.tokenmgr.handler/app}
-  :main com.okl.tokenmgr.filter-file
+  :main com.okl.tokenmgr.cli
   :resource-paths ["resources" "SlickGrid"]
   :profiles
   {:dev {:dependencies [[ring-mock "0.1.5"]]}})

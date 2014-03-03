@@ -1,10 +1,9 @@
-(ns com.okl.tokenmgr.filter-file
-  (:use com.okl.tokenmgr.tokens
-        [clojure.tools.cli :only (cli)])
+(ns com.okl.tokenmgr.cli
   (:require [clojure.java.io :as io]
             [clojure.tools.logging :as log]
-            [clojure.string :as string])
-  (:gen-class))
+            [clojure.string :as string]
+            [com.okl.tokenmgr.tokens :refer :all]
+            [clojure.tools.cli :refer [cli]]))
 
 (defn- process-line [line tokens]
   (log/trace (str "Attempting to process line " line))
