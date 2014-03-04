@@ -43,6 +43,16 @@ change it to whatever you want
 
     lein run filter load <path-to-csv> <app-name> [--delimiter ,]
 
+## Change Log
+* Release 1.1.1 on 2014-03-04
+    * Executable template files generate executable files
+* Release 1.1.0 on 2014-03-03
+    * Tokens added with no value produce empty string value, rather
+      than null and error during filter
+    * Added load command to import tokens from CSV NOTE: now requires
+      filter for old functionality
+
+
 ## License
 
 This is released under the EPL (http://www.eclipse.org/legal/epl-v10.html)
