@@ -147,7 +147,7 @@
 (defn -main  [& args]
   (let [parsed-opts (parse-opts args cli-opts)
         parsed-args (:arguments parsed-opts)]
-    (log/info parsed-opts)
+    (log/debug parsed-opts)
     (if (:errors parsed-opts)
       (usage parsed-opts))
     (cond
