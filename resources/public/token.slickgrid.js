@@ -178,6 +178,12 @@ function TokenSlickGrid(path, urlEncodedPath, prefix) {
             for(i = 0; i < data.length; i++) {
                 if (data[i]['changed']) {
                     data[i]['path'] = path;
+                    if(data[i]['description'] == null ){
+                        data[i]['description'] = "";
+                    }
+                    if(data[i]['value'] == null) {
+                        data[i]['value'] = "";
+                    }
                     result.push(data[i]);
                 }
             }
