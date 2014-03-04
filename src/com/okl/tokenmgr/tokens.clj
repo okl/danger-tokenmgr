@@ -15,7 +15,7 @@
     (catch Exception e
       (throw (IllegalStateException. (str "Error processsing " data ":\n" (.getMessage e)))))))
 
-(defn- coalesce-map [map1 map2]
+(defn coalesce-map [map1 map2]
   "recursively merge maps"
   (merge-with
    #(if(map? %1)

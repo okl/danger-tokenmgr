@@ -79,16 +79,20 @@
        "           import path_to_csv -- loads the entire repository from a "
        "csv file"))
 
-(defn- usage [info]
-  (println (str help-str "\n\nAdditonal parameters\n" info))
+(defn- usage [parsed-opts]
+  (if (:errors parsed-opts)
+    (println (string/join "/" (:errors parsed-opts))))
+  (println (str help-str "\n\nAdditonal parameters\n" (:summary parsed-opts)))
   (System/exit 1))
 
 (def cli-opts
   [["-t" "--token" "Token definitions, TOKEN=VAL"
-    :parse-fn arg->map
+    :required true
+    :parse-fn #(hash-map :token (arg->map %))
     :assoc-fn (fn [previous key val]
-                (merge previous val))]
+                (merge-with coalesce-map previous val))]
    ["-d" "--delimiter" "Character for delimiter in csv-related operations"
+    :required true
     :default "\t"
     :valiate [#(= 1 (count %))]]])
 
@@ -96,9 +100,8 @@
   (let [my-args (rest (:arguments parsed-opts))]
     (log/debug (str "args are " my-args))
     (if (not (= (count my-args) req-arg-cnt))
-      (usage (:summary parsed-opts))
+      (usage parsed-opts)
       my-args)))
-
 
 (defn- store-token [app header row]
   (let [token (zipmap header row)
@@ -144,11 +147,12 @@
 (defn -main  [& args]
   (let [parsed-opts (parse-opts args cli-opts)
         parsed-args (:arguments parsed-opts)]
+    (log/info parsed-opts)
     (if (:errors parsed-opts)
-      (usage (:summary parsed-opts)))
+      (usage parsed-opts))
     (cond
      (= (first parsed-args) "filter") (do-filter parsed-opts)
      (= (first parsed-args) "load") (do-load parsed-opts)
      (= (first parsed-args) "export") (do-export parsed-opts)
      (= (first parsed-args) "import") (do-import parsed-opts)
-     :else (usage (:summary parsed-opts)))))
+     :else (usage parsed-opts))))
