@@ -30,7 +30,9 @@
     (with-open [reader (io/reader file)
                 writer (io/writer output-file)]
       (doseq [line (line-seq reader)]
-        (.write writer (str (process-line line tokens) "\n"))))))
+        (.write writer (str (process-line line tokens) "\n"))))
+    (if (.canExecute file)
+      (.setExecutable output-file true false))))
 
 (defn- find-tmpl-files [dir]
   "find all .tmpl files in this directory and below"
