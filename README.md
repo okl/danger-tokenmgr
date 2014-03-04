@@ -30,9 +30,18 @@ To start a web server for the application, run:
 
 This allows you to run the UI and manage tokens and values.
 
-To run the command line replacement dirver run:
+To run the command line replacement driver run:
 
-    lein run <application-name> <environment> <directory to filter [--token "TOKEN_NAME=TOKEN_VALUE"]
+    lein run filter <application-name> <environment> <directory to
+    filter [--token "TOKEN_NAME=TOKEN_VALUE"]
+
+Now we can also import from csv sources new tokens. The csv is
+expected to have a header row with the token_key (name of token) and
+description columns, as well as one column per environment. By default
+the delimiter is tab, but with --delimiter you should be able to
+change it to whatever you want
+
+    lein run filter load <path-to-csv> <app-name> [--delimiter ,]
 
 ## License
 
