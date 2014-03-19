@@ -32,8 +32,7 @@ This allows you to run the UI and manage tokens and values.
 
 To run the command line replacement driver run:
 
-    lein run filter <application-name> <environment> <directory to
-    filter [--token "TOKEN_NAME=TOKEN_VALUE"]
+    lein run filter <application-name> <environment> <directory to filter> [--token "TOKEN_NAME=TOKEN_VALUE"]
 
 Now we can also import from csv sources new tokens. The csv is
 expected to have a header row with the token_key (name of token) and
