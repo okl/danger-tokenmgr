@@ -40,7 +40,7 @@ description columns, as well as one column per environment. By default
 the delimiter is tab, but with --delimiter you should be able to
 change it to whatever you want
 
-    lein run filter import <app-name> <path-to-csv> [--delimiter ,]
+    lein run import <app-name> <path-to-csv> [--delimiter ,]
 
 ## Change Log
 * Release 1.1.2 on 2014-04-29
