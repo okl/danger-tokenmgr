@@ -76,10 +76,10 @@
        "with values\n\n"
        "           load path_to_csv app -- loads in a new csv into a specified "
        "application\n\n"
-       "           export path_to_csv -- exports the entire repository into a "
-       "csv file\n\n"
-       "           import path_to_csv -- loads the entire repository from a "
-       "csv file"))
+       "           export app path_to_csv -- exports the entire repository into"
+       "a csv file\n\n"
+       "           import app path_to_csv -- loads the entire repository from a"
+       " csv file"))
 
 (defn- usage [parsed-opts]
   (if (:errors parsed-opts)
@@ -124,7 +124,7 @@
          (get token envt))))))
 
 (defn- token->value-list [token environments]
-  [(concat [(:name token)]
+  [(concat [(:name token) (:description token)]
           (map #(let [value (get (get (:values token) %) "value")]
                   (if (nil? value)
                     ""
@@ -138,7 +138,8 @@
   (let [tokens (get-tokens app)
         environments (set (flatten (map #(keys (:values %)) tokens)))]
     (with-open [wrtr (io/writer filename)]
-      (.write wrtr (csv/write-csv [(concat ["key_name"] environments)]
+      (.write wrtr (csv/write-csv [(concat ["key_name" "description"]
+                                           environments)]
                                    :delimiter delimiter))
       (doall (map #(.write wrtr
                            (csv/write-csv (token->value-list % environments)
