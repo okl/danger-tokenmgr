@@ -21,8 +21,8 @@ appropriate for your environment. NOTE: if you're using a prefix, it
 must begin with '/' in order to work properly
 
 Next you must properly initialize the SlickGrid submodule. In the top-level directory, run:
-	git submodule init
-	git submodule update
+    git submodule init
+    git submodule update
 
 To start a web server for the application, run:
 
@@ -41,9 +41,12 @@ description columns, as well as one column per environment. By default
 the delimiter is tab, but with --delimiter you should be able to
 change it to whatever you want
 
-    lein run filter load <path-to-csv> <app-name> [--delimiter ,]
+    lein run filter import <app-name> <path-to-csv> [--delimiter ,]
 
 ## Change Log
+* Release 1.1.2 on 2014-04-29
+    * Replaced load command with import command
+    * Added export command functionality for single application
 * Release 1.1.1 on 2014-03-04
     * Executable template files generate executable files
 * Release 1.1.0 on 2014-03-03

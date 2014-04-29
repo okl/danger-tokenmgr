@@ -115,12 +115,35 @@
       (if (not (or (= envt "key_name")
                    (= envt "description")
                    (= envt "id")
-                   (= envt "module")))
+                   (= envt "module")
+                   (empty? (get token envt))))
         (create-token
          (string/join "/" [app name])
          description
          envt
          (get token envt))))))
+
+(defn- token->value-list [token environments]
+  [(concat [(:name token)]
+          (map #(let [value (get (get (:values token) %) "value")]
+                  (if (nil? value)
+                    ""
+                    value))
+               environments))])
+
+(defn- export-all-apps [filename]
+  nil)
+
+(defn- export-single-app [app filename delimiter]
+  (let [tokens (get-tokens app)
+        environments (set (flatten (map #(keys (:values %)) tokens)))]
+    (with-open [wrtr (io/writer filename)]
+      (.write wrtr (csv/write-csv [(concat ["key_name"] environments)]
+                                   :delimiter delimiter))
+      (doall (map #(.write wrtr
+                           (csv/write-csv (token->value-list % environments)
+                                          :delimiter delimiter))
+                  tokens)))))
 
 (defn- do-filter [parsed-opts]
   (let [[app envt dir] (cli-fn parsed-opts 3)
@@ -129,8 +152,8 @@
         tokens (process-token-values tokens)]
     (process-dir dir tokens)))
 
-(defn- do-load [parsed-opts]
-  (let [[file app] (cli-fn parsed-opts 2)
+(defn- import-single-app [parsed-opts]
+  (let [[app file] (cli-fn parsed-opts 2)
         file-contents (slurp file)
         csv (csv/parse-csv file-contents
                            :delimiter (first (:delimiter (:options parsed-opts))))
@@ -141,10 +164,17 @@
       (store-token app header row))))
 
 (defn- do-import [parsed-opts]
-  nil)
+  (let [parsed-args (:arguments parsed-opts)]
+    (if (= (count parsed-args) 2)
+      nil
+      (import-single-app parsed-opts))))
 
 (defn- do-export [parsed-opts]
-  nil)
+  (let [parsed-args (:arguments parsed-opts)]
+    (if (= (count parsed-args) 2)
+      (export-all-apps (second parsed-args))
+      (export-single-app (second parsed-args) (second (rest parsed-args))
+                         (:delimiter (:options parsed-opts))))))
 
 (defn -main  [& args]
   (let [parsed-opts (parse-opts args cli-opts)
@@ -154,7 +184,6 @@
       (usage parsed-opts))
     (cond
      (= (first parsed-args) "filter") (do-filter parsed-opts)
-     (= (first parsed-args) "load") (do-load parsed-opts)
      (= (first parsed-args) "export") (do-export parsed-opts)
      (= (first parsed-args) "import") (do-import parsed-opts)
      :else (usage parsed-opts))))

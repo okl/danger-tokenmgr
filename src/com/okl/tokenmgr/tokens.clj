@@ -156,7 +156,7 @@
               (str "multiple apps named " app " found.")))
       (first apps))))
 
-(defn- get-value [token envt]
+(defn get-value [token envt]
   "get the value for a token for a particular environment"
   (let [values (:values token)]
     (if (contains? values envt)
