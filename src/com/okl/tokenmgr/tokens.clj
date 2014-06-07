@@ -106,6 +106,13 @@
       (throw (IllegalStateException. (str good-token " already exists as an application")))
       (.create storage full-path (json/write-str combined-json) (token->auto-create-message good-token)))))
 
+(defn- get-app-from-map [app-map]
+  (let [name (subs (get app-map :name) (inc (count base-path)))
+        description (get (read-json-str (get app-map :value)) "description")
+        description (if (nil? description) "" description)]
+    (hash-map :name name
+              :description description)))
+
 (defn get-apps [path]
   "get all of the applications after a particular path"
 
@@ -113,8 +120,7 @@
     (.create storage base-path "" ""))
   (let [full-path (path->full-path path)]
   (map
-   #(hash-map :name (subs (get % :name) (inc (count base-path)))
-              :description (get (read-json-str (get % :value)) "description"))
+   get-app-from-map
    (filter
     app?
     (.subtree storage full-path)))))
