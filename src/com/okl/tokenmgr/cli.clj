@@ -177,14 +177,17 @@
       (export-single-app (second parsed-args) (second (rest parsed-args))
                          (:delimiter (:options parsed-opts))))))
 
+(defn exec [cmd opts]
+  "Execute a single command or print usage."
+  (let [cmds {"filter" do-filter
+              "export" do-export
+              "import" do-import}]
+    ((get cmds cmd #(usage %)) opts)))
+
 (defn -main  [& args]
   (let [parsed-opts (parse-opts args cli-opts)
         parsed-args (:arguments parsed-opts)]
     (log/debug parsed-opts)
     (if (:errors parsed-opts)
-      (usage parsed-opts))
-    (cond
-     (= (first parsed-args) "filter") (do-filter parsed-opts)
-     (= (first parsed-args) "export") (do-export parsed-opts)
-     (= (first parsed-args) "import") (do-import parsed-opts)
-     :else (usage parsed-opts))))
+      (usage parsed-opts)
+      (exec (first parsed-args) parsed-opts))))
