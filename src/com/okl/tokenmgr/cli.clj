@@ -65,11 +65,12 @@
      (mapcat #(hash-map % (process-line (get tokens %)))
              (keys tokens)))))
 
-(defn- arg->map [arg]
+(defn arg->map [arg]
   "Turn a string XXX=YYY to map {XXX YYY}"
-  (let [var (first (string/split arg #"="))
-        value (second (string/split arg #"="))]
-    {var value}))
+  (let [pair (string/split arg #"=" 2)]
+    (if (= 1 (count pair))
+      (hash-map arg "")
+      (apply hash-map pair))))
 
 (def help-str
   (str "Arguments: filter app evnt dir -- filters .tmpl files replacing tokens "
