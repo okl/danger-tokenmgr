@@ -6,14 +6,21 @@
             [clojure.tools.cli :refer [parse-opts]]
             [clojure-csv.core :as csv]))
 
-(defn- expand-line-single [line token]
-  "Returns expanded line with provided token."
-  (string/replace line (str "__" (key token) "__") (val token)))
+(defn- lkup-token
+  "Look up sym in tokens or log and return defval."
+  ([tokens sym defval]
+   (let [v (get tokens sym)]
+     (if (not v)
+       (do (log/error (str "Unknown token: " sym)) defval)
+       v)))
+  ([tokens sym] (lkup-token tokens sym nil)))
 
 (defn expand-line [line tokens]
   "Returns expanded line with all provided tokens."
   (log/trace (str "expand-line: " line))
-  (reduce expand-line-single line (seq tokens)))
+  (string/replace line
+                  #"__([a-zA-Z][a-zA-Z0-9_]*)__"
+                  #(lkup-token tokens (second %) (first %))))
 
 (defn- process-file! [file tokens]
   (log/trace (str "Attempting to process file " (str file)))

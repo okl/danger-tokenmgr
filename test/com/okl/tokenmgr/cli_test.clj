@@ -10,7 +10,8 @@
 (deftest t-expand-line
   (is (= "FOO BAR"
          (expand-line "FOO __FOO__" {"FOO" "BAR"})))
-  (is (= "BAZ" (expand-line "__FOO_BAR__" {"FOO_BAR" "BAZ"}))))
+  (is (= "BAZ" (expand-line "__FOO_BAR__" {"FOO_BAR" "BAZ"})))
+  (is (= "BAZ" (expand-line "__FOO2__" {"FOO2" "BAZ"}))))
 
 (deftest t-process-token-values
   (is (= {"FOO" "BAR"}
