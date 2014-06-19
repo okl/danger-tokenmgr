@@ -6,18 +6,14 @@
             [clojure.tools.cli :refer [parse-opts]]
             [clojure-csv.core :as csv]))
 
-(defn- expand-line [line token]
+(defn- expand-line-single [line token]
   "Returns expanded line with provided token."
   (string/replace line (str "__" (key token) "__") (val token)))
 
-(defn process-line [line tokens]
+(defn expand-line [line tokens]
   "Returns expanded line with all provided tokens."
-  (log/trace (str "process-line: " line))
-  (let [expanded (reduce expand-line line (seq tokens))]
-    (if (= expanded line)
-      expanded
-      (process-line expanded tokens))))
-
+  (log/trace (str "expand-line: " line))
+  (reduce expand-line-single line (seq tokens)))
 
 (defn- process-file! [file tokens]
   (log/trace (str "Attempting to process file " (str file)))
@@ -25,7 +21,7 @@
     (with-open [reader (io/reader file)
                 writer (io/writer output-file)]
       (doseq [line (line-seq reader)]
-        (.write writer (str (process-line line tokens) "\n"))))
+        (.write writer (str (expand-line line tokens) "\n"))))
     (if (.canExecute file)
       (.setExecutable output-file true false))))
 
@@ -52,8 +48,8 @@
       (log/error (str dir " is not a directory")))))
 
 (defn- process-token-values-pass [tokens]
-  "Single pass of tokens through process-line."
-  (into {} (map #(hash-map % (process-line (get tokens %) tokens))
+  "Single pass of tokens through expand-line."
+  (into {} (map #(hash-map % (expand-line (get tokens %) tokens))
                 (keys tokens))))
 
 (defn process-token-values [tokens]
@@ -149,8 +145,7 @@
 (defn- do-filter [parsed-opts]
   (let [[app envt dir] (cli-fn parsed-opts 3)
         cli-tokens (:token (:options parsed-opts))
-        tokens (get-token-values app envt cli-tokens)
-        tokens (process-token-values tokens)]
+        tokens (process-token-values (get-token-values app envt cli-tokens))]
     (process-dir dir tokens)))
 
 (defn- import-single-app [parsed-opts]

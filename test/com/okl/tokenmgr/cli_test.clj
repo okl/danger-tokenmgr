@@ -7,12 +7,10 @@
   (is (= {"FOOBAR" ""} (arg->map "FOOBAR")))
   (is (= {"FOO" "BAR=BAZ"} (arg->map "FOO=BAR=BAZ"))))
 
-(deftest t-process-line
+(deftest t-expand-line
   (is (= "FOO BAR"
-         (process-line "FOO __FOO__" {"FOO" "BAR"})))
-  (is (= "FOO BAZ"
-         (process-line "FOO __FOO__" {"FOO" "__BAR__", "BAR" "BAZ"})))
-  (is (= "BAZ" (process-line "__FOO_BAR__" {"FOO_BAR" "BAZ"}))))
+         (expand-line "FOO __FOO__" {"FOO" "BAR"})))
+  (is (= "BAZ" (expand-line "__FOO_BAR__" {"FOO_BAR" "BAZ"}))))
 
 (deftest t-process-token-values
   (is (= {"FOO" "BAR"}
