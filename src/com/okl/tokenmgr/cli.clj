@@ -6,22 +6,17 @@
             [clojure.tools.cli :refer [parse-opts]]
             [clojure-csv.core :as csv]))
 
+(defn- expand-line [line token]
+  "Returns expanded line with provided token."
+  (string/replace line (str "__" (key token) "__") (val token)))
+
 (defn process-line [line tokens]
-  (log/trace (str "Attempting to process line " line))
-  (let [replace-token
-        (fn [string token]
-          (let [pattern (java.util.regex.Pattern/quote (str "__"(name (key token)) "__"))
-                pattern (re-pattern pattern)
-                matcher (re-matcher pattern string)
-                replacement (java.util.regex.Matcher/quoteReplacement (str (val token)))]
-            (log/trace (str "pattern is " pattern))
-            (log/trace (str "Reduced is " reduced))
-            (log/trace (str "Replacement is " replacement))
-            (.replaceAll matcher replacement)))
-        reduced (reduce replace-token line (seq tokens))]
-    (if (= reduced line)
-      reduced
-      (process-line reduced tokens))))
+  "Returns expanded line with all provided tokens."
+  (log/trace (str "process-line: " line))
+  (let [expanded (reduce expand-line line (seq tokens))]
+    (if (= expanded line)
+      expanded
+      (process-line expanded tokens))))
 
 
 (defn- process-file! [file tokens]
