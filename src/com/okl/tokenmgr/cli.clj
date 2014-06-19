@@ -56,15 +56,18 @@
         (process-file! f tokens))
       (log/error (str dir " is not a directory")))))
 
+(defn- process-token-values-pass [tokens]
+  "Single pass of tokens through process-line."
+  (into {} (map #(hash-map % (process-line (get tokens %) tokens))
+                (keys tokens))))
+
 (defn process-token-values [tokens]
   "Filter token values that contain tokens."
   (log/trace (str "processing token values for " tokens))
-  (if (empty? (filter #(re-find #"__[^_]+__" (get tokens %))
-                      (keys tokens)))
-    tokens
-    (process-token-values
-      (into {} (map #(hash-map % (process-line (get tokens %) tokens))
-                    (keys tokens))))))
+  (let [tokenpass (process-token-values-pass tokens)]
+    (if (= tokens tokenpass)
+      tokens
+      (process-token-values tokenpass))))
 
 (defn arg->map [arg]
   "Turn a string XXX=YYY to map {XXX YYY}"
