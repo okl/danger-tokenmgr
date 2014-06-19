@@ -6,7 +6,7 @@
             [clojure.tools.cli :refer [parse-opts]]
             [clojure-csv.core :as csv]))
 
-(defn- process-line [line tokens]
+(defn process-line [line tokens]
   (log/trace (str "Attempting to process line " line))
   (let [replace-token
         (fn [string token]
@@ -56,14 +56,15 @@
         (process-file! f tokens))
       (log/error (str dir " is not a directory")))))
 
-(defn- process-token-values [tokens]
+(defn process-token-values [tokens]
+  "Filter token values that contain tokens."
   (log/trace (str "processing token values for " tokens))
   (if (empty? (filter #(re-find #"__[^_]+__" (get tokens %))
                       (keys tokens)))
     tokens
     (process-token-values
-     (mapcat #(hash-map % (process-line (get tokens %)))
-             (keys tokens)))))
+      (into {} (map #(hash-map % (process-line (get tokens %) tokens))
+                    (keys tokens))))))
 
 (defn arg->map [arg]
   "Turn a string XXX=YYY to map {XXX YYY}"
