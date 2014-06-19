@@ -8,7 +8,7 @@
                  [org.clojure/data.json "0.2.3"]
                  [org.clojure/tools.logging "0.2.6"]
                  [org.clojure/tools.cli "0.3.1"]
-                 [org.slf4j/slf4j-simple "1.7.5"]
+                 [org.slf4j/slf4j-log4j12 "1.7.5"]
                  [roxxi/clojure-common-utils "0.0.13"]
                  [clj-yaml "0.4.0"]
                  [clojure-csv/clojure-csv "2.0.1"]]
