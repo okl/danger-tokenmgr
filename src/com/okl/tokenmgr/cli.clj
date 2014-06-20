@@ -6,6 +6,9 @@
             [clojure.tools.cli :refer [parse-opts]]
             [clojure-csv.core :as csv]))
 
+;; tokens start with a letter and then can be letters, numbers, or underscores
+(def token-regex #"__([a-zA-Z][a-zA-Z0-9_]*)__")
+
 (defn- lkup-token
   "Look up sym in tokens or log and return defval."
   ([tokens sym defval]
@@ -18,19 +21,24 @@
 (defn expand-line [line tokens]
   "Returns expanded line with all provided tokens."
   (log/trace (str "expand-line: " line))
-  (string/replace line
-                  #"__([a-zA-Z][a-zA-Z0-9_]*)__"
-                  #(lkup-token tokens (second %) (first %))))
+  (string/replace line token-regex #(lkup-token tokens (second %) (first %))))
+
+(defn count-macros [line]
+  "Returns the number of potential expansions in line."
+  (count (re-seq token-regex line)))
 
 (defn- process-file! [file tokens]
+  "Expands file. Returns # of unexpanded macros."
   (log/trace (str "Attempting to process file " (str file)))
   (let [output-file (io/file (string/replace (.getAbsolutePath file) #"\.tmpl$" ""))]
     (with-open [reader (io/reader file)
                 writer (io/writer output-file)]
-      (doseq [line (line-seq reader)]
-        (.write writer (str (expand-line line tokens) "\n"))))
-    (if (.canExecute file)
-      (.setExecutable output-file true false))))
+      (if (.canExecute file)
+        (.setExecutable output-file true false))
+      (reduce + (for [line (line-seq reader)
+                      :let [expanded (expand-line line tokens)]]
+                  (do (.write writer (str expanded "\n"))
+                      (count-macros expanded)))))))
 
 (defn- find-tmpl-files [dir]
   "find all .tmpl files in this directory and below"
@@ -46,12 +54,12 @@
 
 
 (defn- process-dir [dir tokens]
-  "find .tmpl files and replace tokens in them"
+  "Expand tmpl files in dir and return # of unexpanded macros or nil on error."
   (let [dir-file (io/file dir)]
     (log/trace (str "I found things " (find-tmpl-files dir-file)))
     (if (and (.exists dir-file) (.isDirectory dir-file))
-      (doseq [f (find-tmpl-files dir-file)]
-        (process-file! f tokens))
+      (reduce + (for [f (find-tmpl-files dir-file)]
+                  (process-file! f tokens)))
       (log/error (str dir " is not a directory")))))
 
 (defn- process-token-values-pass [tokens]
@@ -150,10 +158,14 @@
                   tokens)))))
 
 (defn- do-filter [parsed-opts]
+  "'filter' command. Returns an exit code."
   (let [[app envt dir] (cli-fn parsed-opts 3)
         cli-tokens (:token (:options parsed-opts))
         tokens (process-token-values (get-token-values app envt cli-tokens))]
-    (process-dir dir tokens)))
+    (let [num-unexpanded (process-dir dir tokens)]
+      (if (or (not num-unexpanded) (> num-unexpanded 0))
+        1
+        0))))
 
 (defn- import-single-app [parsed-opts]
   (let [[app file] (cli-fn parsed-opts 2)
@@ -170,14 +182,16 @@
   (let [parsed-args (:arguments parsed-opts)]
     (if (= (count parsed-args) 2)
       nil
-      (import-single-app parsed-opts))))
+      (import-single-app parsed-opts)))
+  0)
 
 (defn- do-export [parsed-opts]
   (let [parsed-args (:arguments parsed-opts)]
     (if (= (count parsed-args) 2)
       (export-all-apps (second parsed-args))
       (export-single-app (second parsed-args) (second (rest parsed-args))
-                         (:delimiter (:options parsed-opts))))))
+                         (:delimiter (:options parsed-opts)))))
+  0)
 
 (defn exec [cmd opts]
   "Execute a single command or print usage."
@@ -192,4 +206,4 @@
     (log/debug parsed-opts)
     (if (:errors parsed-opts)
       (usage parsed-opts)
-      (exec (first parsed-args) parsed-opts))))
+      (System/exit (exec (first parsed-args) parsed-opts)))))
