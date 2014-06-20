@@ -163,7 +163,7 @@
         cli-tokens (:token (:options parsed-opts))
         tokens (process-token-values (get-token-values app envt cli-tokens))]
     (let [num-unexpanded (process-dir dir tokens)]
-      (if (or (not num-unexpanded) (> num-unexpanded 0))
+      (if (or (nil? num-unexpanded) (> num-unexpanded 0))
         1
         0))))
 
