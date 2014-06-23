@@ -1,6 +1,0 @@
-storage:
-  host: localhost
-  port: 2181
-
-web:
-  prefix: testprefix

@@ -6,33 +6,39 @@
             [clojure.tools.cli :refer [parse-opts]]
             [clojure-csv.core :as csv]))
 
-(defn- process-line [line tokens]
-  (log/trace (str "Attempting to process line " line))
-  (let [replace-token
-        (fn [string token]
-          (let [pattern (java.util.regex.Pattern/quote (str "__"(name (key token)) "__"))
-                pattern (re-pattern pattern)
-                matcher (re-matcher pattern string)
-                replacement (java.util.regex.Matcher/quoteReplacement (str (val token)))]
-            (log/trace (str "pattern is " pattern))
-            (log/trace (str "Reduced is " reduced))
-            (log/trace (str "Replacement is " replacement))
-            (.replaceAll matcher replacement)))
-        reduced (reduce replace-token line (seq tokens))]
-    (if (= reduced line)
-      reduced
-      (process-line reduced tokens))))
+;; tokens start with a letter and then can be letters, numbers, or underscores
+(def token-regex #"__([a-zA-Z][a-zA-Z0-9_]*)__")
 
+(defn- lkup-token
+  "Look up sym in tokens or log and return defval."
+  ([tokens sym defval]
+   (let [v (get tokens sym)]
+     (if (not v)
+       (do (log/error (str "Unknown token: " sym)) defval)
+       v)))
+  ([tokens sym] (lkup-token tokens sym nil)))
+
+(defn expand-line [line tokens]
+  "Returns expanded line with all provided tokens."
+  (log/trace (str "expand-line: " line))
+  (string/replace line token-regex #(lkup-token tokens (second %) (first %))))
+
+(defn count-macros [line]
+  "Returns the number of potential expansions in line."
+  (count (re-seq token-regex line)))
 
 (defn- process-file! [file tokens]
+  "Expands file. Returns # of unexpanded macros."
   (log/trace (str "Attempting to process file " (str file)))
   (let [output-file (io/file (string/replace (.getAbsolutePath file) #"\.tmpl$" ""))]
     (with-open [reader (io/reader file)
                 writer (io/writer output-file)]
-      (doseq [line (line-seq reader)]
-        (.write writer (str (process-line line tokens) "\n"))))
-    (if (.canExecute file)
-      (.setExecutable output-file true false))))
+      (if (.canExecute file)
+        (.setExecutable output-file true false))
+      (reduce + (for [line (line-seq reader)
+                      :let [expanded (expand-line line tokens)]]
+                  (do (.write writer (str expanded "\n"))
+                      (count-macros expanded)))))))
 
 (defn- find-tmpl-files [dir]
   "find all .tmpl files in this directory and below"
@@ -48,28 +54,33 @@
 
 
 (defn- process-dir [dir tokens]
-  "find .tmpl files and replace tokens in them"
+  "Expand tmpl files in dir and return # of unexpanded macros or nil on error."
   (let [dir-file (io/file dir)]
     (log/trace (str "I found things " (find-tmpl-files dir-file)))
     (if (and (.exists dir-file) (.isDirectory dir-file))
-      (doseq [f (find-tmpl-files dir-file)]
-        (process-file! f tokens))
+      (reduce + (for [f (find-tmpl-files dir-file)]
+                  (process-file! f tokens)))
       (log/error (str dir " is not a directory")))))
 
-(defn- process-token-values [tokens]
-  (log/trace (str "processing token values for " tokens))
-  (if (empty? (filter #(re-find #"__[^_]+__" (get tokens %))
-                      (keys tokens)))
-    tokens
-    (process-token-values
-     (mapcat #(hash-map % (process-line (get tokens %)))
-             (keys tokens)))))
+(defn- process-token-values-pass [tokens]
+  "Single pass of tokens through expand-line."
+  (into {} (map #(hash-map % (expand-line (get tokens %) tokens))
+                (keys tokens))))
 
-(defn- arg->map [arg]
+(defn process-token-values [tokens]
+  "Filter token values that contain tokens."
+  (log/trace (str "processing token values for " tokens))
+  (let [tokenpass (process-token-values-pass tokens)]
+    (if (= tokens tokenpass)
+      tokens
+      (process-token-values tokenpass))))
+
+(defn arg->map [arg]
   "Turn a string XXX=YYY to map {XXX YYY}"
-  (let [var (first (string/split arg #"="))
-        value (second (string/split arg #"="))]
-    {var value}))
+  (let [pair (string/split arg #"=" 2)]
+    (if (= 1 (count pair))
+      (hash-map arg "")
+      (apply hash-map pair))))
 
 (def help-str
   (str "Arguments: filter app evnt dir -- filters .tmpl files replacing tokens "
@@ -147,11 +158,14 @@
                   tokens)))))
 
 (defn- do-filter [parsed-opts]
+  "'filter' command. Returns an exit code."
   (let [[app envt dir] (cli-fn parsed-opts 3)
         cli-tokens (:token (:options parsed-opts))
-        tokens (get-token-values app envt cli-tokens)
-        tokens (process-token-values tokens)]
-    (process-dir dir tokens)))
+        tokens (process-token-values (get-token-values app envt cli-tokens))]
+    (let [num-unexpanded (process-dir dir tokens)]
+      (if (or (nil? num-unexpanded) (> num-unexpanded 0))
+        1
+        0))))
 
 (defn- import-single-app [parsed-opts]
   (let [[app file] (cli-fn parsed-opts 2)
@@ -168,23 +182,28 @@
   (let [parsed-args (:arguments parsed-opts)]
     (if (= (count parsed-args) 2)
       nil
-      (import-single-app parsed-opts))))
+      (import-single-app parsed-opts)))
+  0)
 
 (defn- do-export [parsed-opts]
   (let [parsed-args (:arguments parsed-opts)]
     (if (= (count parsed-args) 2)
       (export-all-apps (second parsed-args))
       (export-single-app (second parsed-args) (second (rest parsed-args))
-                         (:delimiter (:options parsed-opts))))))
+                         (:delimiter (:options parsed-opts)))))
+  0)
+
+(defn exec [cmd opts]
+  "Execute a single command or print usage."
+  (let [cmds {"filter" do-filter
+              "export" do-export
+              "import" do-import}]
+    ((get cmds cmd #(usage %)) opts)))
 
 (defn -main  [& args]
   (let [parsed-opts (parse-opts args cli-opts)
         parsed-args (:arguments parsed-opts)]
     (log/debug parsed-opts)
     (if (:errors parsed-opts)
-      (usage parsed-opts))
-    (cond
-     (= (first parsed-args) "filter") (do-filter parsed-opts)
-     (= (first parsed-args) "export") (do-export parsed-opts)
-     (= (first parsed-args) "import") (do-import parsed-opts)
-     :else (usage parsed-opts))))
+      (usage parsed-opts)
+      (System/exit (exec (first parsed-args) parsed-opts)))))
