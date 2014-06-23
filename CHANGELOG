@@ -1,0 +1,27 @@
+# v1.1.3
+
+ - cli: use nil? instead of not (1ff2233)
+ - cli: error exit codes (055f833)
+ - fix logging (c7adcf1)
+ - cli: invert replace logic (8cefcde)
+ - cli: process-line -> expand-line (97885cd)
+ - cli: refactor process-line (6f2b7c8)
+ - cli: support tokens with underscores (4b17363)
+ - cli: fix tokenized tokens (67fa045)
+ - cli: tweak and test arg->map (dc2acb0)
+ - cli: exec using map (f6ad9d3)
+ - tokenmgr.yml: use localhost instead of 127..1 (02710f1)
+ - tokenmgr.yml: whitespace (dcde664)
+ - remove sample tokenmgr.yml (ca69e09)
+
+* Release 1.1.2 on 2014-04-29
+    * Replaced load command with import command
+    * Added export command functionality for single application
+* Release 1.1.1 on 2014-03-04
+    * Executable template files generate executable files
+* Release 1.1.0 on 2014-03-03
+    * Tokens added with no value produce empty string value, rather
+      than null and error during filter
+    * Added load command to import tokens from CSV NOTE: now requires
+      filter for old functionality
+
