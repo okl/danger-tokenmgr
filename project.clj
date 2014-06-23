@@ -1,4 +1,4 @@
-(defproject com.okl.tokenmgr "1.1.3"
+(defproject com.okl.tokenmgr "1.1.4-SNAPSHOP"
   :description "Store tokens in zookeeper and filter them"
   :url "https://github.com/okl/danger-tokenmgr"
   :dependencies [[org.clojure/clojure "1.5.1"]
