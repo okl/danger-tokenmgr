@@ -11,7 +11,11 @@
   (is (= "FOO BAR"
          (expand-line "FOO __FOO__" {"FOO" "BAR"})))
   (is (= "BAZ" (expand-line "__FOO_BAR__" {"FOO_BAR" "BAZ"})))
-  (is (= "BAZ" (expand-line "__FOO2__" {"FOO2" "BAZ"}))))
+  (is (= "BAZ" (expand-line "__FOO2__" {"FOO2" "BAZ"})))
+  (is (= "_BAZ_" (expand-line "___FOO___" {"FOO" "BAZ"})))
+  (is (= "BAZ_" (expand-line "__FOO___" {"FOO" "BAZ"})))
+  (is (= "_BAZ" (expand-line "___FOO__" {"FOO" "BAZ"})))
+  (is (= "___FOO___" (expand-line "___FOO___" {}))))
 
 (deftest t-process-token-values
   (is (= {"FOO" "BAR"}

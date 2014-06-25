@@ -7,7 +7,11 @@
             [clojure-csv.core :as csv]))
 
 ;; tokens start with a letter and then can be letters, numbers, or underscores
-(def token-regex #"__([a-zA-Z][a-zA-Z0-9_]*)__")
+;; and end with a letter or number
+;; groups: 1 - matched leading underscores
+;;         2 - macro (token with underscores)
+;;         3 - token
+(def token-regex #"(_*)(__([a-zA-Z][a-zA-Z0-9_]*[a-zA-Z0-9])__)\1")
 
 (defn- lkup-token
   "Look up sym in tokens or log and return defval."
@@ -21,7 +25,10 @@
 (defn expand-line [line tokens]
   "Returns expanded line with all provided tokens."
   (log/trace (str "expand-line: " line))
-  (string/replace line token-regex #(lkup-token tokens (second %) (first %))))
+  (string/replace
+    line
+    token-regex
+    #(str (nth % 1) (lkup-token tokens (nth % 3) (nth % 2)) (nth % 1))))
 
 (defn count-macros [line]
   "Returns the number of potential expansions in line."
