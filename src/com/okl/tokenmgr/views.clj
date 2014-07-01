@@ -48,7 +48,7 @@
   [:head
    [:title title]
    [:script {:src
-             "https://ajax.googleapis.com/ajax/libs/jquery/1.4.3/jquery.min.js"}]
+             "https://ajax.googleapis.com/ajax/libs/jquery/1.6.4/jquery.min.js"}]
    [:script {:src "http://malsup.github.com/jquery.form.js"}]
    [:link {:rel "stylesheet"
            :href "/slick-grid/slick.grid.css"
@@ -70,6 +70,7 @@
    [:script {:src "https://code.jquery.com/ui/1.10.3/jquery-ui.js"}]
    [:script {:src "/token.slickgrid.js"}]
    [:script {:src "/application.slickgrid.js"}]
+   [:script {:src "/clickhandlers.js"}]
    [:script {:type "text/javascript"}
     "$.fn.serializeObject = function()
 {
@@ -86,7 +87,33 @@
         }
     });
     return o;
-};"]])
+}
+
+"]]
+)
+
+(defn- file-port-page []
+  [:form {:enctype "multipart/form-data"
+          :name "importfile"}
+   [:input {:name "file"
+            :type "file"
+            :size "20"
+            :id "input-file-upload"}]
+   [:br]
+   [:input {:type "submit"
+            :id "input-action-upload"
+            :value "[DEBUG] Import from file"}]
+   ]
+  [:br]
+  [:input {:type "submit"
+           :id "action-import"
+           :value "[DEBUG] Import"}]
+  [:br]
+  [:input {:type "submit"
+           :id "action-export"
+           :value "[DEBUG] Export"}])
+
+
 
 (defn page [app]
   (let [url-encoded-app (if (empty? app)
@@ -96,6 +123,11 @@
      (gen-header (str my-name ":" app))
      [:body
       [:h1 (generate-breadcrumbs app)]
+
+      ;; Disabled web form for file import export, but re-enable once
+      ;; file import/export from web is needed.
+      ;;(file-port-page)
+
       [:div {:id "appdiv" :style "width:1200px;height:300px;"} ""]
       [:input {:type "submit" :class "AppAddNewRow" :value "Add New Row"}]
       [:input {:type "submit" :class "AppSubmitChanges" :value "Submit Changes"}]

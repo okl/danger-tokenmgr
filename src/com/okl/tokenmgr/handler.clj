@@ -1,4 +1,6 @@
 (ns com.okl.tokenmgr.handler
+  (:import
+   (java.io FileInputStream FileNotFoundException IOException File))
   (:use compojure.core
         com.okl.tokenmgr.tokens
         com.okl.tokenmgr.views
@@ -6,10 +8,12 @@
   (:require [compojure.handler :as handler]
             [compojure.route :as route]
             [ring.middleware.json :as middleware]
+            [ring.middleware.multipart-params :as mp]
             [clojure.data.json :as json]
             [clojure.tools.logging :as log]
             [roxxi.utils.print :refer :all]
             [com.okl.tokenmgr.config :as config]
+            [com.okl.tokenmgr.port :as port]
             [clojure.string :as str]))
 (use '[clojure.string :only (join)])
 
@@ -17,6 +21,15 @@
   (let [broker (config/make-yaml-config-broker "conf/tokenmgr.yml")
         config (.web-configuration broker)]
     (:delimiter config)))
+
+(defn- unpack-status [status]
+  (case (:status status)
+    :success    {:status 200
+                 :body "Success"}
+    :user-error {:status 400
+                 :body (str "Warning: " (:message status))}
+    :sys-error  {:status 500
+                 :body (str "Error: " (:message status))}))
 
 (defroutes app-routes
   (GET "/" []
@@ -96,6 +109,18 @@
       (catch IllegalStateException e
         {:status 200
          :body {:status "failure" :message (.getMessage e)}})))
+
+;;; For debug, useful for file import/export from website,
+;;; but needs to accept web file transfer.
+
+  ;; (POST "/api/file/import" []
+  ;;   (let [status (port/import-tokens "store.json" :json)]
+  ;;     (unpack-status status)))
+
+  ;; (POST "/api/file/export" []
+  ;;   (let [status (port/export-tokens "store.json" :json)]
+  ;;     (unpack-status status)))
+
   (route/resources "")
   (route/not-found "Not Found"))
 

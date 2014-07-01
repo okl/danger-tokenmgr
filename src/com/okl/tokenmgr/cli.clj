@@ -3,6 +3,7 @@
             [clojure.tools.logging :as log]
             [clojure.string :as string]
             [com.okl.tokenmgr.tokens :refer :all]
+            [com.okl.tokenmgr.port :as port]
             [clojure.tools.cli :refer [parse-opts]]
             [clojure-csv.core :as csv]))
 
@@ -149,8 +150,24 @@
                     value))
                environments))])
 
+(defn- handle-port-status [status]
+  (case (:status status)
+    :success 0
+    :sys-error  (do (prn :message status) 1)
+    :user-error (do (prn :message status) 1)))
+
+(defn- call-port
+  "Calls the port facility for import/export.
+Currently forced through JSON for backup control."
+  [port-method filename]
+  (handle-port-status
+   ((port-method {:import port/import-tokens
+                  :export port/export-tokens})
+    filename
+    :json)))
+
 (defn- export-all-apps [filename]
-  nil)
+  (call-port :export filename))
 
 (defn- export-single-app [app filename delimiter]
   (let [tokens (get-tokens app)
@@ -173,6 +190,10 @@
       (if (or (nil? num-unexpanded) (> num-unexpanded 0))
         1
         0))))
+
+(defn- import-all-apps [filename]
+  (call-port :import filename))
+
 
 (defn- import-single-app [parsed-opts]
   (let [[app file] (cli-fn parsed-opts 2)
@@ -200,11 +221,25 @@
                          (:delimiter (:options parsed-opts)))))
   0)
 
+(defn- do-backup [parsed-opts]
+  (let [parsed-args (:arguments parsed-opts)]
+    (if (= (count parsed-args) 2)
+      (export-all-apps (second parsed-args))
+      1)))
+
+(defn- do-restore [parsed-opts]
+  (let [parsed-args (:arguments parsed-opts)]
+    (if (= (count parsed-args) 2)
+      (import-all-apps (second parsed-args))
+      1)))
+
 (defn exec [cmd opts]
   "Execute a single command or print usage."
   (let [cmds {"filter" do-filter
               "export" do-export
-              "import" do-import}]
+              "import" do-import
+              "backup" do-backup
+              "restore" do-restore}]
     ((get cmds cmd #(usage %)) opts)))
 
 (defn -main  [& args]

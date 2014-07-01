@@ -11,7 +11,8 @@
                  [org.slf4j/slf4j-log4j12 "1.7.5"]
                  [roxxi/clojure-common-utils "0.0.13"]
                  [clj-yaml "0.4.0"]
-                 [clojure-csv/clojure-csv "2.0.1"]]
+                 [clojure-csv/clojure-csv "2.0.1"]
+                 [cheshire "5.3.1"]]
   :plugins [[lein-ring "0.8.5"]]
   :ring {:handler com.okl.tokenmgr.handler/app}
   :main com.okl.tokenmgr.cli
