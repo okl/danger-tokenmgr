@@ -153,8 +153,8 @@
 (defn- handle-port-status [status]
   (case (:status status)
     :success 0
-    :sys-error  (do (prn :message status) 1)
-    :user-error (do (prn :message status) 1)))
+    :sys-error  1
+    :user-error 1))
 
 (defn- call-port
   "Calls the port facility for import/export.
