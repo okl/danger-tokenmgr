@@ -21,10 +21,7 @@ cleanup () {
 
 trap cleanup EXIT
 
-S3_BUCKET="okl-ansible-tokenmgr-backup"
-S3_ENV="prod"
-S3_HOST="dancible.newokl.com"
-S3_PATH="/opt/danger-tokenmgr"
+source conf/backup_conf.sh
 
 # CD so lein has correct context
 cd $SCRIPT_HOME
@@ -64,7 +61,7 @@ EMAIL
 			;;
 	esac
 
-	mail -s "Tokenmgr Backup Failed" danger-fails@onekingslane.com\
+	mail -s "Tokenmgr Backup Failed" $FAIL_MAIL\
 < $TMP/backup.email
 fi
 
