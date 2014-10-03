@@ -1,4 +1,5 @@
 (ns com.okl.tokenmgr.cli
+  (:gen-class)
   (:require [clojure.java.io :as io]
             [clojure.tools.logging :as log]
             [clojure.string :as string]
