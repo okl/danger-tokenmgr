@@ -17,5 +17,6 @@
   :ring {:handler com.okl.tokenmgr.handler/app}
   :main com.okl.tokenmgr.cli
   :resource-paths ["resources" "SlickGrid"]
+  :target-path "target/%s"
   :profiles
   {:dev {:dependencies [[ring-mock "0.1.5"]]}})
