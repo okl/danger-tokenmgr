@@ -10,11 +10,12 @@
         string (join ":" [(:host config) (:port config)])]
     string))
 
-(def my-connection (atom (zk/connect (zk-string))))
+(def my-connection (atom nil))
 
 ;; obtain a client; will reconnect if the client has closed
 (defn- get-client []
-  (if (= :CLOSED (zk/state @my-connection))
+  (if (or (nil? @my-connection)
+          (= :CLOSED (zk/state @my-connection)))
     (swap! my-connection (fn[x] (zk/connect (zk-string)))))
   @my-connection)
 
