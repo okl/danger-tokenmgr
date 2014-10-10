@@ -96,10 +96,13 @@
        "with values\n\n"
        "           load path_to_csv app -- loads in a new csv into a specified "
        "application\n\n"
-       "           export app path_to_csv -- exports the entire repository into"
+       "           export app path_to_csv -- exports the an application into"
        "a csv file\n\n"
-       "           import app path_to_csv -- loads the entire repository from a"
-       " csv file"))
+       "           import app path_to_csv -- loads the an application from a"
+       " csv file\n\n"
+       "           backup path_to_json -- exports the everything into json\n\n"
+       "           restore path_to_json -- restores from backup json file"))
+
 
 (defn- usage [parsed-opts]
   (if (:errors parsed-opts)
@@ -209,18 +212,17 @@ Currently forced through JSON for backup control."
 
 (defn- do-import [parsed-opts]
   (let [parsed-args (:arguments parsed-opts)]
-    (if (= (count parsed-args) 2)
-      nil
-      (import-single-app parsed-opts)))
-  0)
+    (if (= (count parsed-args) 3)
+      (import-single-app parsed-opts)
+      1)))
 
 (defn- do-export [parsed-opts]
   (let [parsed-args (:arguments parsed-opts)]
-    (if (= (count parsed-args) 2)
-      (export-all-apps (second parsed-args))
+    (if (= (count parsed-args) 3)
       (export-single-app (second parsed-args) (second (rest parsed-args))
-                         (:delimiter (:options parsed-opts)))))
-  0)
+                         (:delimiter (:options parsed-opts)))
+      1)))
+
 
 (defn- do-backup [parsed-opts]
   (let [parsed-args (:arguments parsed-opts)]
