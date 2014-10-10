@@ -1,0 +1,43 @@
+#!/bin/sh
+#
+# Run-level startup script for tokenmgr
+#
+# chkconfig: 235 99 20
+# description: startup/shutdown tokenmgr
+
+TOKENMGR_HOME=/opt/danger-tokenmgr
+TOKENMGR_USER=awx
+
+if [ ! -f $TOKENMGR_HOME/project.clj ]
+then
+  echo "tokenmgr not found"
+  exit 1
+fi
+
+case "$1" in 
+  start)
+    echo -n "Starting tokenmgr: "
+    su - $TOKENMGR_USER -c "/bin/bash -c \"cd $TOKENMGR_HOME; lein ring server-headless &> var/ring.out\" &"
+    touch /var/lock/subsys/tokenmgr
+    echo "OK"
+    ;;
+  stop)
+    echo -n "Stopping tokenmgr: "
+    `ps auxww | grep $TOKENMGR_HOME | grep -v grep | awk '{print $2}' | xargs kill`
+    rm /var/lock/subsys/tokenmgr
+    echo "OK"
+    ;;
+  status)
+    OUTPUT=`ps auxww | grep $TOKENMGR_HOME | grep -v grep`
+    if test -z "$OUTPUT"; then
+       echo "tokenmgr is stopped"
+    else
+       echo "tokenmgr is running"
+    fi
+    ;;
+ *)
+    echo "Usage: $0 start|stop|status"
+    exit 1
+    ;;
+esac
+

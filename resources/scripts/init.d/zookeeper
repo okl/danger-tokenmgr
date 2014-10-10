@@ -1,0 +1,44 @@
+#!/bin/sh
+#
+# Run-level startup script for zookeeper
+#
+# chkconfig: 235 99 20
+# description: startup/shutdown zookeeper
+
+ZK_HOME=/opt/zookeeper/zookeeper-3.4.5
+ZK_USER=zookeeper
+
+if [ ! -f $ZK_HOME/bin/zkServer.sh ]
+then
+  echo "Zookeeper not found"
+  exit 1
+fi
+
+case "$1" in 
+  start)
+    echo -n "Starting zookeeper: "
+    su - $ZK_USER -c "$ZK_HOME/bin/zkServer.sh start"
+    touch /var/lock/subsys/zookeeper
+    echo "OK"
+    ;;
+  stop)
+    echo -n "Stopping zookeeper: "
+    su - $ZK_USER -c "$ZK_HOME/bin/zkServer.sh stop"
+    rm /var/lock/subsys/zookeeper
+    echo "OK"
+    ;;
+  status)
+    output=`ps auxww | grep $ZK_HOME | grep -v grep`
+    if test -z "$output"; then
+      echo "Zookeeper is stopped"
+    else
+      echo "Zookeeper is running"
+    fi
+    ;;
+  *)
+    echo "Usage: $0 start|stop|status"
+    exit 1
+esac
+exit 0
+
+
