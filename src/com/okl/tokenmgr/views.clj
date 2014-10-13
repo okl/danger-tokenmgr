@@ -128,13 +128,13 @@
       ;; file import/export from web is needed.
       ;;(file-port-page)
 
-      [:div {:id "appdiv" :style "width:1200px;height:300px;"} ""]
+      [:div {:id "appdiv" :style "height:300px;"} ""]
       [:input {:type "submit" :class "AppAddNewRow" :value "Add New Row"}]
       [:input {:type "submit" :class "AppSubmitChanges" :value "Submit Changes"}]
       [:input {:type "submit" :class "AppResetChanges" :value "Reset Changes"}]
       [:script {:type "text/javascript"}
        (str "var appGrid = new AppSlickGrid('" app "', '"url-encoded-app "', '" (prefix) "', '" (delimiter) "');")]
-      [:div {:id "tokendiv" :style "width:1200px;height:300px;"} ""]
+      [:div {:id "tokendiv" :style "height:300px;"} ""]
       [:input {:type "submit" :class "TokenAddNewRow" :value "Add New Row"}]
       [:input {:type "submit" :class "TokenSubmitChanges" :value "Submit Changes"}]
       [:input {:type "submit" :class "TokenResetChanges" :value "Reset Changes"}]
