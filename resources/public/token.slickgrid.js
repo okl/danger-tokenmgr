@@ -34,12 +34,12 @@ function TokenSlickGrid(path, urlEncodedPath, prefix) {
     }
 
     var columns = [
-        {id: 'token', name: 'Token', field: 'name', width: 100, editor: Slick.Editors.Text, sortable: true},
-        {id: 'description', name: 'Description', field: 'description', width: 200, editor: Slick.Editors.Text},
-        {id: 'environment', name: 'Environment', field: 'environment', width: 200, sortable: true, editor: Slick.Editors.Text},
-        {id: 'value', name: 'Value', field: 'value', width: 200, editor: Slick.Editors.Text},
-        {id: 'source', name: 'Source', field: 'source', width: 400, sortable: true, formatter: sourceFormatter},
-        {id: 'delete', name: 'Delete', field: 'delete', width: 200, formatter: deleteButtonFormatter}];
+        {id: 'token', name: 'Token', field: 'name', editor: Slick.Editors.Text, sortable: true},
+        {id: 'description', name: 'Description', field: 'description', editor: Slick.Editors.Text},
+        {id: 'environment', name: 'Environment', field: 'environment', sortable: true, editor: Slick.Editors.Text},
+        {id: 'value', name: 'Value', field: 'value', editor: Slick.Editors.Text},
+        {id: 'source', name: 'Source', field: 'source', sortable: true, formatter: sourceFormatter},
+        {id: 'delete', name: 'Delete', field: 'delete', formatter: deleteButtonFormatter}];
 
     var options = {
         editable: true,
