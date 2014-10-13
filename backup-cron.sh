@@ -21,7 +21,7 @@ cleanup () {
 
 trap cleanup EXIT
 
-source conf/backup_conf.sh
+source $SCRIPT_HOME/conf/backup_conf.sh
 
 # CD so lein has correct context
 cd $SCRIPT_HOME
