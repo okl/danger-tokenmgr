@@ -34,7 +34,7 @@ function AppSlickGrid(path, urlEncodedPath, prefix, delimiter) {
     var columns = [
         {id: 'application', name: 'Application', field: 'name', editor: Slick.Editors.Text, sortable: true, formatter: appFormatter},
         {id: 'description', name: 'Description', field: 'description', editor: Slick.Editors.Text},
-        {id: 'delete', name: 'Delete', field: 'delete', formatter: deleteButtonFormatter}];
+        {id: 'delete', name: 'Delete', field: 'delete', formatter: deleteButtonFormatter, maxWidth: 80}];
 
     var options = {
         editable: true,
@@ -181,4 +181,26 @@ function AppSlickGrid(path, urlEncodedPath, prefix, delimiter) {
             addNewRow();
         });
     });
+
+ function resize() {
+	 var width = $(window).width() - 25;
+	 $("#appdiv").width(width);
+	 grid.resizeCanvas();
+	 grid.autosizeColumns();
+ }
+
+if(window.attachEvent) {
+    window.attachEvent('onresize', function() {
+        resize();
+    });
+}
+else if(window.addEventListener) {
+    window.addEventListener('resize', function() {
+        resize();
+    }, true);
+}
+
+
+	return grid;
+
 }
