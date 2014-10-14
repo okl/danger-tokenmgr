@@ -39,7 +39,7 @@ function TokenSlickGrid(path, urlEncodedPath, prefix) {
         {id: 'environment', name: 'Environment', field: 'environment', sortable: true, editor: Slick.Editors.Text},
         {id: 'value', name: 'Value', field: 'value', editor: Slick.Editors.Text},
         {id: 'source', name: 'Source', field: 'source', sortable: true, formatter: sourceFormatter},
-        {id: 'delete', name: 'Delete', field: 'delete', formatter: deleteButtonFormatter}];
+        {id: 'delete', name: 'Delete', field: 'delete', formatter: deleteButtonFormatter, maxWidth: 80}];
 
     var options = {
         editable: true,
@@ -198,4 +198,14 @@ function TokenSlickGrid(path, urlEncodedPath, prefix) {
             addNewRow();
         });
     });
+
+	window.onresize = function(){
+		console.log(grid);
+		var width = $(window).width() - 25;
+		$("#tokendiv").width(width);
+		grid.resizeCanvas();
+		grid.autosizeColumns();
+	}
+
+	return grid;
 }
