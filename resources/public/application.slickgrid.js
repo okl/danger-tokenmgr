@@ -27,7 +27,7 @@ function AppSlickGrid(path, urlEncodedPath, prefix, delimiter) {
             var link = "<a href='" + prefix + "/application/" + encodeURIComponent(value) + "'>" + name + "</a>";
             return link;
         } else {
-	    return value;
+        return value;
         }
     }
 
@@ -183,10 +183,10 @@ function AppSlickGrid(path, urlEncodedPath, prefix, delimiter) {
     });
 
  function resize() {
-	 var width = $(window).width() - 25;
-	 $("#appdiv").width(width);
-	 grid.resizeCanvas();
-	 grid.autosizeColumns();
+     var width = $(window).width() - 25;
+     $("#appdiv").width(width);
+     grid.resizeCanvas();
+     grid.autosizeColumns();
  }
 
 if(window.attachEvent) {
@@ -201,6 +201,6 @@ else if(window.addEventListener) {
 }
 
 
-	return grid;
+    return grid;
 
 }

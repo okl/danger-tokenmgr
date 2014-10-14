@@ -200,10 +200,10 @@ function TokenSlickGrid(path, urlEncodedPath, prefix) {
     });
 
  function resize() {
-	 var width = $(window).width() - 25;
-	 $("#tokendiv").width(width);
-	 grid.resizeCanvas();
-	 grid.autosizeColumns();
+     var width = $(window).width() - 25;
+     $("#tokendiv").width(width);
+     grid.resizeCanvas();
+     grid.autosizeColumns();
  }
 
 
@@ -220,5 +220,5 @@ else if(window.addEventListener) {
 
 
 
-	return grid;
+    return grid;
 }
