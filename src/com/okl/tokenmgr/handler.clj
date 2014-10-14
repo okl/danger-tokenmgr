@@ -42,10 +42,18 @@
     (get-apps ""))
   (GET "/api/applications/:app" [app]
     (get-apps app))
-  (GET "/api/tokens/:app" [app]
-    (denormalize-tokens (get-tokens (url-decode app))))
-  (GET "/api/tokens/" []
-    (denormalize-tokens (get-tokens "")))
+  (GET "/api/tokens/:app" [app sort-col sort-dir]
+    (let [tokens (denormalize-tokens (get-tokens (url-decode app)))
+          sort-dir (or sort-dir "asc")
+          sort-col (or sort-col "name")
+          sorted-data (sort-by #(get % (keyword sort-col)) tokens)]
+      (if (= "asc" sort-dir)
+        sorted-data
+        (reverse sorted-data))))
+  (GET "/api/tokens/" [sort-dir sort-col]
+    (let [tokens (denormalize-tokens (get-tokens ""))]
+      (println "Sorting by " sort-col)
+      (sort-by (symbol sort-col) tokens)))
   (DELETE "/api/applications/:delimited-app" [delimited-app]
     (try
       (let [app (str/replace delimited-app (delimiter) "/")]
