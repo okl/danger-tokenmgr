@@ -6,6 +6,8 @@ function AppSlickGrid(path, urlEncodedPath, prefix, delimiter) {
 
     var grid;
     var dv;
+    var currentSortField = 'name';
+    var isAsc = true;
 
     var rowCounter = 1;
     function addNewRow() {
@@ -48,7 +50,8 @@ function AppSlickGrid(path, urlEncodedPath, prefix, delimiter) {
 
     function reloadTable() {
         $.ajax({
-            url: prefix + '/api/applications/' + urlEncodedPath,
+            url: prefix + '/api/applications/' + urlEncodedPath + '?sort-col='
+                + currentSortField + '&sort-dir=' + (isAsc ? 'asc' : 'desc'),
             type: 'GET',
             success: function(data) {
                 for (i = 0; i < data.length; i++) {
@@ -85,24 +88,9 @@ function AppSlickGrid(path, urlEncodedPath, prefix, delimiter) {
 
     $(function () {
         dv = Slick.Data.DataView();
-        var gridSorter = function(columnField, isAsc, grid, gridData) {
-            var sign = isAsc ? 1 : -1;
-            var field = columnField
-            gridData.sort(function (dataRow1, dataRow2) {
-                var value1 = dataRow1[field], value2 = dataRow2[field];
-                var result = (value1 == value2) ?  0 :
-                    ((value1 > value2 ? 1 : -1)) * sign;
-                return result;
-            });
-            grid.invalidate();
-            grid.render();
-        }
-
         grid = new Slick.Grid('#appdiv', dv, columns, options);
 
-        gridSorter('app', true, grid, dv);
-
-        grid.setSortColumn('app', true);
+        grid.setSortColumn('application', true);
 
         grid.autosizeColumns();
 
@@ -117,7 +105,9 @@ function AppSlickGrid(path, urlEncodedPath, prefix, delimiter) {
         reloadTable();
 
         grid.onSort.subscribe(function(e, args) {
-            gridSorter(args.sortCol.field, args.sortAsc, grid, dv);
+            currentSortField = args.sortCol.field;
+            isAsc = args.sortAsc
+            reloadTable();
         });
 
         dv.onRowCountChanged.subscribe(function(e, args) {
