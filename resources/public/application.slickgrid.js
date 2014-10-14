@@ -27,7 +27,7 @@ function AppSlickGrid(path, urlEncodedPath, prefix, delimiter) {
             var link = "<a href='" + prefix + "/application/" + encodeURIComponent(value) + "'>" + name + "</a>";
             return link;
         } else {
-        return value;
+            return value;
         }
     }
 
@@ -182,23 +182,23 @@ function AppSlickGrid(path, urlEncodedPath, prefix, delimiter) {
         });
     });
 
- function resize() {
-     var width = $(window).width() - 25;
-     $("#appdiv").width(width);
-     grid.resizeCanvas();
-     grid.autosizeColumns();
- }
+    function resize() {
+        var width = $(window).width() - 25;
+        $("#appdiv").width(width);
+        grid.resizeCanvas();
+        grid.autosizeColumns();
+    }
 
-if(window.attachEvent) {
-    window.attachEvent('onresize', function() {
-        resize();
-    });
-}
-else if(window.addEventListener) {
-    window.addEventListener('resize', function() {
-        resize();
-    }, true);
-}
+    if(window.attachEvent) {
+        window.attachEvent('onresize', function() {
+            resize();
+        });
+    }
+    else if(window.addEventListener) {
+        window.addEventListener('resize', function() {
+            resize();
+        }, true);
+    }
 
 
     return grid;
