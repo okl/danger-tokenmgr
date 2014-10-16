@@ -7,6 +7,8 @@ function TokenSlickGrid(path, urlEncodedPath, prefix) {
 
     var grid;
     var dv;
+    var currentSortField = 'name';
+    var isAsc = true;
 
     var rowCounter = 1;
     function addNewRow() {
@@ -53,7 +55,8 @@ function TokenSlickGrid(path, urlEncodedPath, prefix) {
 
     function reloadTable() {
         $.ajax({
-            url: prefix + '/api/tokens/' + urlEncodedPath,
+            url: prefix + '/api/tokens/' + urlEncodedPath + '?sort-col='
+                + currentSortField + '&sort-dir=' + (isAsc ? "asc" : "desc"),
             type: 'GET',
             success: function(data) {
                 for (i = 0; i < data.length; i++) {
@@ -90,22 +93,8 @@ function TokenSlickGrid(path, urlEncodedPath, prefix) {
 
     $(function () {
         dv = Slick.Data.DataView();
-        var gridSorter = function(columnField, isAsc, grid, gridData) {
-            var sign = isAsc ? 1 : -1;
-            var field = columnField
-            gridData.sort(function (dataRow1, dataRow2) {
-                var value1 = dataRow1[field], value2 = dataRow2[field];
-                var result = (value1 == value2) ?  0 :
-                    ((value1 > value2 ? 1 : -1)) * sign;
-                return result;
-            });
-            grid.invalidate();
-            grid.render();
-        }
 
         grid = new Slick.Grid('#tokendiv', dv, columns, options);
-
-        gridSorter('token', true, grid, dv);
 
         grid.setSortColumn('token', true);
 
@@ -122,7 +111,9 @@ function TokenSlickGrid(path, urlEncodedPath, prefix) {
         reloadTable();
 
         grid.onSort.subscribe(function(e, args) {
-            gridSorter(args.sortCol.field, args.sortAsc, grid, dv);
+            currentSortField = args.sortCol.field;
+            isAsc = args.sortAsc
+            reloadTable();
         });
 
         dv.onRowCountChanged.subscribe(function(e, args) {
