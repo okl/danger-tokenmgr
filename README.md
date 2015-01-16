@@ -27,7 +27,7 @@ Next you must properly initialize the SlickGrid submodule. In the top-level dire
 
 To start a web server for the application, run:
 
-    lein ring server
+    lein ring server-headless
 
 This allows you to run the UI and manage tokens and values.
 
