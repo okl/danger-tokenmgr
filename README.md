@@ -22,6 +22,7 @@ NOTE: If you're using a prefix, then it must begin with '/' in order to work
       properly.
 
 Next you must properly initialize the SlickGrid submodule. In the top-level directory, run:
+
     git submodule init
     git submodule update
 
